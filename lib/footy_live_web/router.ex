@@ -20,6 +20,9 @@ defmodule FootyLiveWeb.Router do
     get "/", PageController, :home
     live "/games", GamesLive
     live "/teams", TeamsLive
+    live "/teams/:team_id", TeamProfileLive
+
+    live "/premiership_window", PremiershipWindowLive
   end
 
   # Other scopes may use custom stacks.

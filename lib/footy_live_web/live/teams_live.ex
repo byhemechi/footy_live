@@ -40,11 +40,15 @@ defmodule FootyLiveWeb.TeamsLive do
             <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
               <.table id="teams" rows={teams}>
                 <:col :let={team} label="ID">{team.id}</:col>
-                <:col :let={team} label="Name">{team.name}</:col>
+                <:col :let={team} label="Name">
+                  <.link navigate={~p"/teams/#{team.id}"} class="text-blue-600 hover:underline">
+                    {team.name}
+                  </.link>
+                </:col>
                 <:col :let={team} label="Abbreviation">{team.abbrev}</:col>
                 <:col :let={team} label="Logo">
                   <%= if team.logo do %>
-                    <img src={"https://squiggle.au/" <> team.logo} alt={team.name} class="h-8 w-8" />
+                    <img src={"https://squiggle.com.au/#{team.logo}"} alt={team.name} class="h-8 w-8" />
                   <% end %>
                 </:col>
                 <:col :let={team} label="Debut">{team.debut}</:col>
