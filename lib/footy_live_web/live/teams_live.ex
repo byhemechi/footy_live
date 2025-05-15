@@ -12,6 +12,7 @@ defmodule FootyLiveWeb.TeamsLive do
     socket =
       socket
       |> assign(:page_title, "AFL Teams")
+      |> assign(:route, :teams)
       |> assign(:teams, Teams.list_teams())
 
     {:ok, socket}
@@ -22,19 +23,15 @@ defmodule FootyLiveWeb.TeamsLive do
     ~H"""
     <Layouts.app {assigns}>
       <div class="px-4 sm:px-6 lg:px-8">
-        <div class="sm:flex sm:items-center">
-          <div class="sm:flex-auto">
-            <h1 class="text-base font-semibold leading-6 text-gray-900">AFL Teams</h1>
-            <p class="mt-2 text-sm text-gray-700">
-              A list of all AFL teams and their details.
-            </p>
-          </div>
-          <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+        <.header>
+          Teams
+          <:subtitle>A list of all AFL teams and their details.</:subtitle>
+          <:actions>
             <.button phx-click="refresh" phx-disable-with="Loading...">
               Refresh Teams
             </.button>
-          </div>
-        </div>
+          </:actions>
+        </.header>
         <div class="mt-8 flow-root">
           <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">

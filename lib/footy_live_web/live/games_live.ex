@@ -16,6 +16,7 @@ defmodule FootyLiveWeb.GamesLive do
       |> assign(:teams, Teams.list_teams())
       |> assign(:rounds, Games.list_rounds())
       |> assign(:round, 0)
+      |> assign(:route, :games)
       |> assign(:loading, false)
 
     {:ok, socket}

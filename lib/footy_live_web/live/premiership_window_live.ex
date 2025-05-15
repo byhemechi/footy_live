@@ -9,6 +9,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
       <div class="flex-1 flex items-center justify-center">
         <div class="rounded-lg bg-base-200 p-8 relative card w-max">
           <div class="absolute bg-success/30 size-[calc(33%_+_var(--spacing)_*8)] rounded top-0 right-0" />
+          <div class="absolute bg-error/30 size-[calc(33%_+_var(--spacing)_*8)] rounded bottom-0 left-0" />
           <div class="w-96 h-96 relative">
             <img
               :for={team <- @teams}
@@ -16,7 +17,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               y={(@averages[team.id] |> elem(1)) - 1.5}
               src={"https://squiggle.com.au/" <> team.logo}
               id={"badge-#{team.id}"}
-              class="size-10 transition-all -translate-x-1/2 -translate-y-1/2 absolute bg-base-300 rounded-full object-contain p-1"
+              class="size-10 transition-all -translate-x-1/2 -translate-y-1/2 absolute bg-base-300 p-1 backdrop-blur rounded-full object-contain"
               style={
                 [
                   "left: #{(elem(@averages[team.id], 0) - @min_for) / (@max_for - @min_for) * 100}%",
@@ -97,6 +98,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     {:ok,
      socket
      |> assign(:teams, teams)
+     |> assign(:route, :premiership_window)
      |> calculate_and_assign_stats(teams, games)}
   end
 

@@ -1,24 +1,31 @@
-<header class="px-4 sm:px-6 lg:px-8">
-  <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
-    <div class="flex items-center gap-4">
-      <a href="/">
-        <.icon name="hero-home" class="h-5 w-5" />
-      </a>
-      <.link navigate={~p"/teams"} class="hover:text-zinc-700">
-        Teams
-      </.link>
-      <.link navigate={~p"/games"} class="hover:text-zinc-700">
-        Games
-      </.link>
-      <.link navigate={~p"/premiership_window"} class="hover:text-zinc-700">
-        Percentage chart
-      </.link>
-    </div>
-    <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
-      <a href="https://github.com/nicholasjhenry/footy-live" class="hover:text-zinc-700">
-        GitHub
-      </a>
-    </div>
+<header class="navbar px-4 sm:px-6 max-w-screen-lg mx-auto gap-4">
+  <.link navigate={~p"/"} class="flex gap-2 w-max">
+    <img
+      src={~p"/images/logo.webp"}
+      class="flex-1 flex items-center gap-2 size-16 object-contain"
+    />
+  </.link>
+  <nav class="tabs tabs-box">
+    <.link navigate={~p"/teams"} class={["tab", assigns[:route] == :teams && "tab-active"]}>
+      Teams
+    </.link>
+
+    <.link navigate={~p"/games"} class={["tab", assigns[:route] == :games && "tab-active"]}>
+      Fixture
+    </.link>
+    <.link
+      navigate={~p"/premiership_window"}
+      class={["tab", assigns[:route] == :premiership_window && "tab-active"]}
+    >
+      Percentage table
+    </.link>
+  </nav>
+  <div class="flex-none ml-auto">
+    <ul class="flex flex-column px-1 space-x-2 items-center">
+      <li>
+        <.theme_toggle />
+      </li>
+    </ul>
   </div>
 </header>
 
