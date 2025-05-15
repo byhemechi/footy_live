@@ -127,8 +127,11 @@ defmodule FootyLive.Games do
   defp do_refresh do
     case Squiggle.games(year: DateTime.utc_now().year) do
       {:ok, %{games: games}} ->
+        games =
+          games
+          |> Enum.map(&struct(Squiggle.Game, &1))
+
         games
-        |> Enum.map(&struct(Squiggle.Game, &1))
         |> Enum.each(fn game ->
           :ets.insert(table_name(), {game.id, game})
         end)

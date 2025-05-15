@@ -1,42 +1,34 @@
 defmodule FootyLiveWeb.PremiershipWindowLive do
   alias Squiggle.{Game, Team}
   use FootyLiveWeb, :live_view
+  @topic "games"
 
   def render(assigns) do
     ~H"""
-    <svg
-      class="h-screen bg-base-200"
-      viewbox={"#{@min_for} #{@min_against} #{@max_for - @min_for} #{@max_against - @min_against}"}
-    >
-      <rect
-        x={@min_for + (@max_for - @min_for) * 2 / 3}
-        y={@min_against}
-        width={200}
-        height={(@max_against - @min_against) / 3}
-        class="fill-success/30"
-      />
-      <image
-        :for={team <- @teams}
-        x={(@averages[team.id] |> elem(0)) - 1.5}
-        y={(@averages[team.id] |> elem(1)) - 1.5}
-        href={"https://squiggle.com.au/" <> team.logo}
-        width="3"
-        height="3"
-      />
-    </svg>
-    <.table rows={@teams} id="matrix">
-      <:col :let={team} label="Name">{team.name}</:col>
-      <:col :let={team} label="Average score for">
-        {@averages[team.id] |> elem(0) |> :erlang.float_to_binary(decimals: 2)}
-      </:col>
-      <:col :let={team} label="Average score against">
-        {@averages[team.id] |> elem(1) |> :erlang.float_to_binary(decimals: 2)}
-      </:col>
-      <:col :let={team} label="Percentage">
-        {((@averages[team.id] |> elem(0)) / (@averages[team.id] |> elem(1)) * 100)
-        |> :erlang.float_to_binary(decimals: 2)}
-      </:col>
-    </.table>
+    <Layouts.app {assigns}>
+      <div class="flex-1 flex items-center justify-center">
+        <div class="rounded-lg bg-base-200 p-8 relative card w-max">
+          <div class="absolute bg-success/30 size-[calc(33%_+_var(--spacing)_*8)] rounded top-0 right-0" />
+          <div class="w-96 h-96 relative">
+            <img
+              :for={team <- @teams}
+              x={(@averages[team.id] |> elem(0)) - 1.5}
+              y={(@averages[team.id] |> elem(1)) - 1.5}
+              src={"https://squiggle.com.au/" <> team.logo}
+              id={"badge-#{team.id}"}
+              class="size-10 transition-all -translate-x-1/2 -translate-y-1/2 absolute bg-base-300 rounded-full object-contain p-1"
+              style={
+                [
+                  "left: #{(elem(@averages[team.id], 0) - @min_for) / (@max_for - @min_for) * 100}%",
+                  "top: #{(elem(@averages[team.id], 1) - @min_against) / (@max_against - @min_against) * 100}%"
+                ]
+                |> Enum.join(";")
+              }
+            />
+          </div>
+        </div>
+      </div>
+    </Layouts.app>
     """
   end
 
@@ -95,9 +87,25 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
   end
 
   def mount(_, _, socket) do
+    if connected?(socket) do
+      Phoenix.PubSub.subscribe(FootyLive.PubSub, @topic)
+    end
+
     teams = FootyLive.Teams.list_teams()
     games = FootyLive.Games.list_games()
 
+    {:ok,
+     socket
+     |> assign(:teams, teams)
+     |> calculate_and_assign_stats(teams, games)}
+  end
+
+  def handle_info({:games_updated, games}, socket) do
+    teams = socket.assigns.teams
+    {:noreply, calculate_and_assign_stats(socket, teams, games)}
+  end
+
+  defp calculate_and_assign_stats(socket, teams, games) do
     averages =
       for %Team{id: id} <- teams do
         {id, {games |> average_score_for(id), games |> average_score_against(id)}}
@@ -118,15 +126,13 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
       averages
       |> Enum.reduce(:infinity, fn {_id, {_for, against}}, current -> min(against, current) end)
 
-    {:ok,
-     socket
-     |> assign(
-       averages: averages,
-       teams: teams,
-       max_for: max_for,
-       max_against: max_against,
-       min_for: min_for,
-       min_against: min_against
-     )}
+    socket
+    |> assign(
+      averages: averages,
+      max_for: max_for,
+      max_against: max_against,
+      min_for: min_for,
+      min_against: min_against
+    )
   end
 end

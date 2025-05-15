@@ -36,16 +36,14 @@ defmodule FootyLiveWeb.GamesLive do
     ~H"""
     <Layouts.app {assigns}>
       <div class="px-4 sm:px-6 lg:px-8">
-        <div class="sm:flex sm:items-center">
-          <div class="sm:flex-auto flex flex-col">
-            <h1 class="text-base font-semibold leading-6 text-gray-900">AFL Games</h1>
-          </div>
-          <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+        <.header class="flex items-center justify-between">
+          AFL Games
+          <:actions>
             <.button phx-click="refresh" phx-disable-with="Loading...">
               Refresh Games
             </.button>
-          </div>
-        </div>
+          </:actions>
+        </.header>
         <div class="tabs tabs-box">
           <.link
             :for={round <- @rounds}

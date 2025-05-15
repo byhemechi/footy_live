@@ -97,6 +97,19 @@
 @custom-variant phx-change-loading ([".phx-change-loading&", ".phx-change-loading &"]);
 
 /* Make LiveView wrapper divs transparent for layout */
-[data-phx-root-id] { display: contents }
+[data-phx-root-id] {
+  display: contents;
+}
 
 /* This file is for your main application CSS */
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
