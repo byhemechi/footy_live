@@ -6,7 +6,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
   def render(assigns) do
     ~H"""
     <Layouts.app {assigns}>
-      <div class="size-[calc(min(100dvh_-_var(--spacing)_*_20,_100dvw))] m-auto p-4">
+      <div class="w-full max-w-screen-lg h-[calc(min(100dvh_-_var(--spacing)_*_20,_100dvw))] m-auto p-4">
         <div
           class="rounded-lg grid bg-base-200 relative card size-full gap-1.5 p-4"
           style="grid-template-rows: auto 1.5em 1.5em; grid-template-columns: 1.5em 1.5em auto;"
@@ -70,6 +70,18 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <path
                 d={
                   [
+                    "M #{(@start_against * 1.13 - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / 1.13 - @start_against) / (@end_against - @start_against)}",
+                    "L 1,#{(@end_for / 1.3 - @start_against) / (@end_against - @start_against)}",
+                    "L #{(@start_against * 1.3 - @start_for) / (@end_for - @start_for)},0"
+                  ]
+                  |> Enum.join("\n")
+                }
+                class="fill-warning/20 transition-all"
+              />
+              <path
+                d={
+                  [
                     "M #{(@start_against * 1.3 - @start_for) / (@end_for - @start_for)},0",
                     "L 1,#{(@end_for / 1.3 - @start_against) / (@end_against - @start_against)}",
                     "L 1 0"
@@ -87,6 +99,17 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                   |> Enum.join("\n")
                 }
                 class="fill-transparent transition-all stroke-success stroke-2"
+                vector-effect="non-scaling-stroke"
+              />
+              <path
+                d={
+                  [
+                    "M #{(@start_against * 1.13 - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / 1.13 - @start_against) / (@end_against - @start_against)}"
+                  ]
+                  |> Enum.join("\n")
+                }
+                class="fill-transparent transition-all stroke-warning stroke-2"
                 vector-effect="non-scaling-stroke"
               />
               <path
@@ -140,6 +163,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 "flex items-center justify-center -translate-x-1/2 -translate-y-1/2 absolute",
                 case @averages[team.id] do
                   {s_for, s_against} when s_for / s_against >= 1.3 -> "ring ring-success"
+                  {s_for, s_against} when s_for / s_against >= 1.13 -> "ring ring-warning"
                   {s_for, s_against} when s_for / s_against >= 1.02 -> "ring ring-neutral"
                   {s_for, s_against} when s_for / s_against <= 0.69 -> "ring ring-error"
                   _ -> nil
