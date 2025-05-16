@@ -7,35 +7,58 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     ~H"""
     <Layouts.app {assigns}>
       <div class="size-[calc(min(100dvh_-_var(--spacing)_*_20,_100dvw))] m-auto p-4">
-        <div class="rounded-lg bg-base-200 p-16 relative card size-full">
-          <div class="w-full h-full relative">
+        <div
+          class="rounded-lg grid bg-base-200 relative card size-full gap-1.5 p-4"
+          style="grid-template-rows: min-content 1.5em auto; grid-template-columns: min-content 1.5em auto;"
+        >
+          <div class="text-base-content/80 font-semibold row-start-1 col-start-3 text-center">
+            Average Goals For
+          </div>
+          <div class="text-base-content/80 font-semibold row-start-3 col-start-1 text-center rotate-180 [writing-mode:vertical-lr]">
+            Average Goals Against
+          </div>
+
+          <div class="col-start-3 row-start-2 relative">
             <div
               :for={n <- @start_for..@end_for//5}
-              class="w-px h-full bg-base-300 absolute"
-              style={ "left: #{(n - @start_for) / (@end_for - @start_for) * 100}%"}
-            />
-            <div
-              :for={n <- @start_for..@end_for//5}
-              class="-top-4 -translate-x-1/2 -translate-y-full text-base-content/50 absolute"
+              :if={n > @start_for && n < @end_for}
+              }
+              id={"tick-x-#{n}"}
+              class="-translate-x-1/2 bottom-0 text-base-content/30 absolute transition-all"
               style={ "left: #{(n - @start_for) / (@end_for - @start_for) * 100}%"}
             >
               {n}
             </div>
+          </div>
+          <div class="row-start-3 col-start-2 relative">
             <div
               :for={n <- @start_against..@end_against//5}
-              class="h-px w-full bg-base-300 absolute"
+              :if={n > @start_against && n < @end_against}
+              id={"tick-y-#{n}"}
+              class="right-0 transition-all [writing-mode:vertical-lr] rotate-180 -translate-y-1/2 text-base-content/30 absolute"
+              style={ "top: #{(n - @start_against) / (@end_against - @start_against) * 100}%"}
+            >
+              {n}
+            </div>
+          </div>
+          <div class="w-full h-full relative row-start-3 col-start-3 border-base-300 border overflow-hidden bg-base-100 rounded-lg">
+            <div
+              :for={n <- @start_for..@end_for//5}
+              :if={n > @start_for && n < @end_for}
+              class="w-px h-full bg-base-300 absolute transition-all"
+              id={"line-x-#{n}"}
+              style={ "left: #{(n - @start_for) / (@end_for - @start_for) * 100}%"}
+            />
+            <div
+              :for={n <- @start_against..@end_against//5}
+              :if={n > @start_against && n < @end_against}
+              class="h-px w-full bg-base-300 absolute transition-all"
+              id={"line-y-#{n}"}
               style={ "top: #{(n - @start_against) / (@end_against - @start_against) * 100}%"}
             />
 
-            <div
-              :for={n <- @start_against..@end_against//5}
-              class="-left-4 -translate-x-full -translate-y-1/2 text-base-content/50 absolute"
-              style={ "top: #{(n - @start_against) / (@end_against - @start_against) * 100}%"}
-            >
-              {n}
-            </div>
-            <div class="absolute bg-success/10 size-1/3 rounded top-0 right-0 grid place-content-center text-success/50" />
-            <div class="absolute bg-error/10 size-1/3 rounded bottom-0 left-0 text-error/50 grid place-content-center" />
+            <div class="absolute bg-success/10 size-1/3 top-0 right-0 grid place-content-center text-success/50" />
+            <div class="absolute bg-error/10 size-1/3 bottom-0 left-0 text-error/50 grid place-content-center" />
             <img
               :for={team <- @teams}
               x={(@averages[team.id] |> elem(0)) - 1.5}
