@@ -6,22 +6,47 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
   def render(assigns) do
     ~H"""
     <Layouts.app {assigns}>
-      <div class="flex-1 flex items-center justify-center">
-        <div class="rounded-lg bg-base-200 p-8 relative card w-max">
-          <div class="absolute bg-success/30 size-[calc(33%_+_var(--spacing)_*8)] rounded top-0 right-0" />
-          <div class="absolute bg-error/30 size-[calc(33%_+_var(--spacing)_*8)] rounded bottom-0 left-0" />
-          <div class="w-96 h-96 relative">
+      <div class="size-[calc(min(100dvh_-_var(--spacing)_*_20,_100dvw))] m-auto p-4">
+        <div class="rounded-lg bg-base-200 p-16 relative card size-full">
+          <div class="w-full h-full relative">
+            <div
+              :for={n <- @start_for..@end_for//5}
+              class="w-px h-full bg-base-300 absolute"
+              style={ "left: #{(n - @start_for) / (@end_for - @start_for) * 100}%"}
+            />
+            <div
+              :for={n <- @start_for..@end_for//5}
+              class="-top-4 -translate-x-1/2 -translate-y-full text-base-content/50 absolute"
+              style={ "left: #{(n - @start_for) / (@end_for - @start_for) * 100}%"}
+            >
+              {n}
+            </div>
+            <div
+              :for={n <- @start_against..@end_against//5}
+              class="h-px w-full bg-base-300 absolute"
+              style={ "top: #{(n - @start_against) / (@end_against - @start_against) * 100}%"}
+            />
+
+            <div
+              :for={n <- @start_against..@end_against//5}
+              class="-left-4 -translate-x-full -translate-y-1/2 text-base-content/50 absolute"
+              style={ "top: #{(n - @start_against) / (@end_against - @start_against) * 100}%"}
+            >
+              {n}
+            </div>
+            <div class="absolute bg-success/10 size-1/3 rounded top-0 right-0 grid place-content-center text-success/50" />
+            <div class="absolute bg-error/10 size-1/3 rounded bottom-0 left-0 text-error/50 grid place-content-center" />
             <img
               :for={team <- @teams}
               x={(@averages[team.id] |> elem(0)) - 1.5}
               y={(@averages[team.id] |> elem(1)) - 1.5}
-              src={"https://squiggle.com.au/" <> team.logo}
+              src={"https://live.squiggle.com.au/" <> team.name <> ".png"}
               id={"badge-#{team.id}"}
-              class="size-10 transition-all -translate-x-1/2 -translate-y-1/2 absolute bg-base-300 p-1 backdrop-blur rounded-full object-contain"
+              class="size-10 transition-all -translate-x-1/2 -translate-y-1/2 absolute bg-base-300 shadow rounded-full object-cover"
               style={
                 [
-                  "left: #{(elem(@averages[team.id], 0) - @min_for) / (@max_for - @min_for) * 100}%",
-                  "top: #{(elem(@averages[team.id], 1) - @min_against) / (@max_against - @min_against) * 100}%"
+                  "left: #{(elem(@averages[team.id], 0) - @start_for) / (@end_for - @start_for) * 100}%",
+                  "top: #{(elem(@averages[team.id], 1) - @start_against) / (@end_against - @start_against) * 100}%"
                 ]
                 |> Enum.join(";")
               }
@@ -134,7 +159,11 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
       max_for: max_for,
       max_against: max_against,
       min_for: min_for,
-      min_against: min_against
+      min_against: min_against,
+      start_for: floor(min_for / 5) * 5 - 5,
+      end_for: ceil(max_for / 5) * 5 + 5,
+      start_against: floor(min_against / 5) * 5 - 5,
+      end_against: ceil(max_against / 5) * 5 + 5
     )
   end
 end
