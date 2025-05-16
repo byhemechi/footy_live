@@ -66,6 +66,65 @@ defmodule FootyLive.Games do
   def list_games_by_round(_), do: []
 
   @doc """
+  Returns a game by its ID.
+  """
+  def get_game(id) when is_integer(id) do
+    case :ets.lookup(table_name(), id) do
+      [{^id, game}] -> game
+      [] -> nil
+    end
+  end
+
+  def get_game(id) when is_binary(id) do
+    case Integer.parse(id) do
+      {num, _} -> get_game(num)
+      :error -> nil
+    end
+  end
+
+  def get_game(_), do: nil
+
+  @doc """
+  Stores a single game in the cache and broadcasts the update.
+  """
+  def put_game(%Squiggle.Game{} = game) do
+    :ets.insert(table_name(), {game.id, game})
+    sorted_games = list_games()
+    Phoenix.PubSub.broadcast(FootyLive.PubSub, @topic, {:games_updated, sorted_games})
+    game
+  end
+
+  def put_game(game) when is_map(game) do
+    put_game(struct(Squiggle.Game, game))
+  end
+
+  def put_game(_), do: nil
+
+  @doc """
+  Stores multiple games in the cache and broadcasts the update.
+  """
+  def put_games(games) when is_list(games) do
+    games =
+      games
+      |> Enum.map(fn
+        %Squiggle.Game{} = game -> game
+        game when is_map(game) -> struct(Squiggle.Game, game)
+        _ -> nil
+      end)
+      |> Enum.reject(&is_nil/1)
+
+    for game <- games do
+      :ets.insert(table_name(), {game.id, game})
+    end
+
+    sorted_games = list_games()
+    Phoenix.PubSub.broadcast(FootyLive.PubSub, @topic, {:games_updated, sorted_games})
+    games
+  end
+
+  def put_games(_), do: []
+
+  @doc """
   Returns a sorted list of all available rounds.
   """
   def list_rounds do
@@ -131,14 +190,7 @@ defmodule FootyLive.Games do
           games
           |> Enum.map(&struct(Squiggle.Game, &1))
 
-        games
-        |> Enum.each(fn game ->
-          :ets.insert(table_name(), {game.id, game})
-        end)
-
-        sorted_games = Enum.sort_by(games, & &1.date)
-        Phoenix.PubSub.broadcast(FootyLive.PubSub, @topic, {:games_updated, sorted_games})
-        sorted_games
+        put_games(games)
 
       {:error, _} ->
         []

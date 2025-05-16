@@ -15,6 +15,8 @@ defmodule FootyLive.Application do
       FootyLive.Teams,
       # Start the Games cache
       FootyLive.Games,
+      # Start the Realtime service
+      FootyLive.Realtime,
       # Start to serve requests, typically the last entry
       FootyLiveWeb.Endpoint
     ]
