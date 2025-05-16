@@ -193,7 +193,6 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
         :if={round}
         class={["tab transition-all", @round == round && "tab-active"]}
         patch={~p"/premiership_window?round=#{round}"}
-        phx-click="set_round"
       >
         {round}
       </.link>
