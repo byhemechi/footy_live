@@ -9,12 +9,12 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
       <div class="size-[calc(min(100dvh_-_var(--spacing)_*_20,_100dvw))] m-auto p-4">
         <div
           class="rounded-lg grid bg-base-200 relative card size-full gap-1.5 p-4"
-          style="grid-template-rows: min-content 1.5em auto; grid-template-columns: min-content 1.5em auto;"
+          style="grid-template-rows: auto 1.5em 1.5em; grid-template-columns: 1.5em 1.5em auto;"
         >
-          <div class="text-base-content/80 font-semibold row-start-1 col-start-3 text-center">
+          <div class="text-base-content/80 font-semibold row-start-3 col-start-3 text-center">
             Average Goals For
           </div>
-          <div class="text-base-content/80 font-semibold row-start-3 col-start-1 text-center rotate-180 [writing-mode:vertical-lr]">
+          <div class="text-base-content/80 font-semibold row-start-1 col-start-1 text-center rotate-180 [writing-mode:vertical-rl]">
             Average Goals Against
           </div>
 
@@ -30,7 +30,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               {n}
             </div>
           </div>
-          <div class="row-start-3 col-start-2 relative">
+          <div class="row-start-1 col-start-2 relative">
             <div
               :for={n <- @start_against..@end_against//5}
               :if={n > @start_against && n < @end_against}
@@ -41,7 +41,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               {n}
             </div>
           </div>
-          <div class="w-full h-full relative row-start-3 col-start-3 border-base-300 border overflow-hidden bg-base-100 rounded-lg">
+          <div class="w-full h-full relative row-start-1 col-start-3 border-base-300 border overflow-hidden bg-base-100 rounded-lg">
             <div
               :for={n <- @start_for..@end_for//5}
               :if={n > @start_for && n < @end_for}
