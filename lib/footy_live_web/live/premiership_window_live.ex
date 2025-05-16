@@ -47,7 +47,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               {n}
             </div>
           </div>
-          <div class="w-full h-full relative row-start-1 col-start-3 border-base-300 border overflow-hidden bg-base-100 rounded-lg">
+          <div class="w-full h-full relative row-start-1 col-start-3 border-base-300 border overflow-hidden bg-base-100 rounded-lg isolate">
             <svg class="size-full absolute inset-0" preserveAspectRatio="none" viewbox="0 0 1 1">
               <g id="lines">
                 <path
@@ -129,12 +129,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
             <div
               :for={
                 team <-
-                  Enum.sort_by(@teams, fn team ->
-                    case @averages[team.id] do
-                      {s_for, s_against} -> s_for / s_against
-                      _ -> 0
-                    end
-                  end)
+                  @teams
               }
               :if={@averages[team.id]}
               src={"https://squiggle.com.au/" <> team.logo}
@@ -154,7 +149,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               style={
                 [
                   "left: #{(elem(@averages[team.id], 0) - @start_for) / (@end_for - @start_for) * 100}%",
-                  "top: #{(elem(@averages[team.id], 1) - @start_against) / (@end_against - @start_against) * 100}%"
+                  "top: #{(elem(@averages[team.id], 1) - @start_against) / (@end_against - @start_against) * 100}%",
+                  "z-index: #{(elem(@averages[team.id], 0) / elem(@averages[team.id], 1) * 1000) |> round}"
                 ]
                 |> Enum.join(";")
               }
