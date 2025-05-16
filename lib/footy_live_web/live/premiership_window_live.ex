@@ -12,10 +12,10 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
           style="grid-template-rows: auto 1.5em 1.5em; grid-template-columns: 1.5em 1.5em auto;"
         >
           <div class="text-base-content/80 font-semibold row-start-3 col-start-3 text-center">
-            Average Goals For
+            Average Points For
           </div>
           <div class="text-base-content/80 font-semibold row-start-1 col-start-1 text-center rotate-180 [writing-mode:vertical-rl]">
-            Average Goals Against
+            Average Points Against
           </div>
 
           <div class="col-start-3 row-start-2 relative">
