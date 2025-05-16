@@ -133,8 +133,13 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               id={"badge-#{team.abbrev}"}
               title={"#{team.name}: #{elem(@averages[team.id], 0) |> :erlang.float_to_binary(decimals: 1)} for, #{elem(@averages[team.id], 1)  |> :erlang.float_to_binary(decimals: 1)} against"}
               class={[
-                "size-9 transition-all rounded-full border-2 shadow border-base-300 text-white",
-                "flex items-center justify-center -translate-x-1/2 -translate-y-1/2 absolute"
+                "size-9 transition-all rounded-full border-2 shadow border-base-200 text-white",
+                "flex items-center justify-center -translate-x-1/2 -translate-y-1/2 absolute",
+                case @averages[team.id] do
+                  {s_for, s_against} when s_for / s_against >= 1.3 -> "ring ring-success"
+                  {s_for, s_against} when s_for / s_against <= 0.69 -> "ring ring-error"
+                  _ -> nil
+                end
               ]}
               data-club={team.abbrev}
               style={
