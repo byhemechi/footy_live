@@ -1,7 +1,7 @@
 defmodule FootyLiveWeb.PremiershipWindowLive do
   alias Squiggle.{Game, Team}
   use FootyLiveWeb, :live_view
-  @topic "games"
+  @topic "live_games"
 
   def render(assigns) do
     ~H"""
@@ -149,37 +149,38 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 vector-effect="non-scaling-stroke"
               />
             </svg>
-            <div
-              :for={
-                team <-
-                  @teams
-              }
-              :if={@averages[team.id]}
-              src={"https://squiggle.com.au/" <> team.logo}
-              id={"badge-#{team.abbrev}"}
-              title={"#{team.name}: #{elem(@averages[team.id], 0) |> :erlang.float_to_binary(decimals: 1)} for, #{elem(@averages[team.id], 1)  |> :erlang.float_to_binary(decimals: 1)} against"}
-              class={[
-                "size-9 transition-all rounded-full border-2 shadow border-base-200 text-white",
-                "flex items-center justify-center -translate-x-1/2 -translate-y-1/2 absolute",
-                case @averages[team.id] do
-                  {s_for, s_against} when s_for / s_against >= 1.3 -> "ring ring-success"
-                  {s_for, s_against} when s_for / s_against >= 1.13 -> "ring ring-warning"
-                  {s_for, s_against} when s_for / s_against >= 1.02 -> "ring ring-neutral"
-                  {s_for, s_against} when s_for / s_against <= 0.69 -> "ring ring-error"
-                  _ -> nil
-                end
-              ]}
-              data-club={team.abbrev}
-              style={
-                [
-                  "left: #{(elem(@averages[team.id], 0) - @start_for) / (@end_for - @start_for) * 100}%",
-                  "top: #{(elem(@averages[team.id], 1) - @start_against) / (@end_against - @start_against) * 100}%",
-                  "z-index: #{(elem(@averages[team.id], 0) / elem(@averages[team.id], 1) * 1000) |> round}"
-                ]
-                |> Enum.join(";")
-              }
-            >
-              <div class="initials text-xs font-semibold">{team.abbrev}</div>
+            <div class="contents" id="teams" phx-update="stream">
+              <div
+                :for={
+                  {dom_id, {team, {s_for, s_against}}} <-
+                    @streams.teams
+                }
+                src={"https://squiggle.com.au/" <> team.logo}
+                id={dom_id}
+                title={"#{team.name}: #{s_for |> :erlang.float_to_binary(decimals: 1)} for, #{s_against  |> :erlang.float_to_binary(decimals: 1)} against"}
+                class={[
+                  "size-9 transition-all rounded-full border-2 shadow border-base-200 text-white",
+                  "flex items-center justify-center -translate-x-1/2 -translate-y-1/2 absolute",
+                  cond do
+                    s_for / s_against >= 1.3 -> "ring ring-success"
+                    s_for / s_against >= 1.13 -> "ring ring-warning"
+                    s_for / s_against >= 1.02 -> "ring ring-neutral"
+                    s_for / s_against <= 0.69 -> "ring ring-error"
+                    true -> nil
+                  end
+                ]}
+                data-club={team.abbrev}
+                style={
+                  [
+                    "left: #{(s_for - @start_for) / (@end_for - @start_for) * 100}%",
+                    "top: #{(s_against - @start_against) / (@end_against - @start_against) * 100}%",
+                    "z-index: #{(s_for / s_against * 1000) |> round}"
+                  ]
+                  |> Enum.join(";")
+                }
+              >
+                <div class="initials text-xs font-semibold">{team.abbrev}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -191,7 +192,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
         :for={round <- @rounds}
         :if={round}
         class={["tab transition-all", @round == round && "tab-active"]}
-        patch={~p"/premiership_window?round=#{round}"}
+        navigate={~p"/premiership_window?round=#{round}"}
       >
         {round}
       </.link>
@@ -261,19 +262,11 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     running_count / total_games
   end
 
-  def mount(_, _, socket) do
+  def mount(params, _, socket) do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(FootyLive.PubSub, @topic)
     end
 
-    {:ok,
-     socket
-     |> assign(:route, :premiership_window)
-     |> assign(:page_title, "Percentage Chart")
-     |> assign(:rounds, FootyLive.Games.list_rounds())}
-  end
-
-  def handle_params(params, _uri, socket) do
     round =
       case params do
         %{"round" => round} ->
@@ -288,8 +281,11 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     teams = FootyLive.Teams.list_teams()
     games = FootyLive.Games.list_games()
 
-    {:noreply,
+    {:ok,
      socket
+     |> assign(:route, :premiership_window)
+     |> assign(:page_title, "Percentage Chart")
+     |> assign(:rounds, FootyLive.Games.list_rounds())
      |> calculate_and_assign_stats(teams, games, round)
      |> assign(:teams, teams)
      |> assign(:round, round)}
@@ -300,7 +296,18 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     {:noreply, calculate_and_assign_stats(socket, teams, games, socket.assigns.round)}
   end
 
-  defp calculate_and_assign_stats(socket, teams, games, max_round) do
+  def handle_info({:game_updated, game}, socket) do
+    teams = socket.assigns.teams
+    games = FootyLive.Games.list_games()
+
+    {:noreply,
+     calculate_and_assign_stats(socket, teams, games, socket.assigns.round, [
+       game.hteamid,
+       game.ateamid
+     ])}
+  end
+
+  defp calculate_and_assign_stats(socket, teams, games, max_round, team_ids \\ nil) do
     games =
       case max_round do
         _ when is_integer(max_round) ->
@@ -331,13 +338,25 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
       averages
       |> Enum.reduce(250, fn {_id, {_for, against}}, current -> min(against, current) end)
 
+    teams =
+      case team_ids do
+        [_ | _] -> teams |> Enum.filter(&Enum.member?(team_ids, &1.id))
+        _ -> teams
+      end
+
     socket
     |> assign(
-      averages: averages,
       start_for: floor(min_for / 5) * 5 - 5,
       end_for: ceil(max_for / 5) * 5 + 5,
       start_against: floor(min_against / 5) * 5 - 5,
       end_against: ceil(max_against / 5) * 5 + 5
+    )
+    |> stream(
+      :teams,
+      for team <- teams do
+        {team, averages[team.id]}
+      end,
+      dom_id: fn {team, _averages} -> "team-#{team.id}" end
     )
   end
 end

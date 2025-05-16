@@ -7,6 +7,7 @@ defmodule FootyLive.Games do
 
   @default_table_name :afl_games
   @topic "games"
+  @realtime_topic "live_games"
   @refresh_interval :timer.hours(1)
 
   def start_link(opts \\ []) do
@@ -91,6 +92,7 @@ defmodule FootyLive.Games do
     :ets.insert(table_name(), {game.id, game})
     sorted_games = list_games()
     Phoenix.PubSub.broadcast(FootyLive.PubSub, @topic, {:games_updated, sorted_games})
+    Phoenix.PubSub.broadcast(FootyLive.PubSub, @realtime_topic, {:game_updated, game})
     game
   end
 
