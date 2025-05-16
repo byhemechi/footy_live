@@ -61,9 +61,9 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
             <div class="absolute bg-error/10 size-1/3 bottom-0 left-0 text-error/50 grid place-content-center" />
             <img
               :for={team <- @teams}
-              src={"https://live.squiggle.com.au/" <> team.name <> ".png"}
+              src={"https://squiggle.com.au/" <> team.logo}
               id={"badge-#{team.id}"}
-              class="size-10 transition-all -translate-x-1/2 -translate-y-1/2 absolute bg-base-300 shadow rounded-full object-cover"
+              class="size-10 transition-all -translate-x-1/2 -translate-y-1/2 absolute object-contain"
               style={
                 [
                   "left: #{(elem(@averages[team.id], 0) - @start_for) / (@end_for - @start_for) * 100}%",
@@ -160,6 +160,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     {:ok,
      socket
      |> assign(:route, :premiership_window)
+     |> assign(:page_title, "Percentage Chart")
      |> assign(:rounds, FootyLive.Games.list_rounds())}
   end
 
