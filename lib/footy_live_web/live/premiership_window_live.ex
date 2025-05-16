@@ -42,28 +42,35 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
             </div>
           </div>
           <div class="w-full h-full relative row-start-1 col-start-3 border-base-300 border overflow-hidden bg-base-100 rounded-lg">
-            <div
-              :for={n <- @start_for..@end_for//5}
-              :if={n > @start_for && n < @end_for}
-              class="w-px h-full bg-base-300 absolute transition-all"
-              id={"line-x-#{n}"}
-              style={ "left: #{(n - @start_for) / (@end_for - @start_for) * 100}%"}
-            />
-            <div
-              :for={n <- @start_against..@end_against//5}
-              :if={n > @start_against && n < @end_against}
-              class="h-px w-full bg-base-300 absolute transition-all"
-              id={"line-y-#{n}"}
-              style={ "top: #{(n - @start_against) / (@end_against - @start_against) * 100}%"}
-            />
-
+            <div id="lines" class="contents">
+              <div
+                :for={n <- @start_for..@end_for//5}
+                :if={n > @start_for && n < @end_for}
+                class="w-px h-full bg-base-300 absolute transition-all"
+                id={"line-x-#{n}"}
+                style={ "left: #{(n - @start_for) / (@end_for - @start_for) * 100}%"}
+              />
+              <div
+                :for={n <- @start_against..@end_against//5}
+                :if={n > @start_against && n < @end_against}
+                class="h-px w-full bg-base-300 absolute transition-all"
+                id={"line-y-#{n}"}
+                style={ "top: #{(n - @start_against) / (@end_against - @start_against) * 100}%"}
+              />
+            </div>
             <div class="absolute bg-success/10 size-1/3 top-0 right-0 grid place-content-center text-success/50" />
             <div class="absolute bg-error/10 size-1/3 bottom-0 left-0 text-error/50 grid place-content-center" />
-            <img
+            <div
               :for={team <- @teams}
+              :if={@averages[team.id]}
               src={"https://squiggle.com.au/" <> team.logo}
-              id={"badge-#{team.id}"}
-              class="size-10 transition-all -translate-x-1/2 -translate-y-1/2 absolute object-contain"
+              id={"badge-#{team.abbrev}"}
+              title={"#{team.name}: #{elem(@averages[team.id], 0) |> :erlang.float_to_binary(decimals: 1)} for, #{elem(@averages[team.id], 1)  |> :erlang.float_to_binary(decimals: 1)} against"}
+              class={[
+                "size-9 transition-all rounded-full border-2 shadow border-base-300 text-white",
+                "flex items-center justify-center -translate-x-1/2 -translate-y-1/2 absolute"
+              ]}
+              data-club={team.abbrev}
               style={
                 [
                   "left: #{(elem(@averages[team.id], 0) - @start_for) / (@end_for - @start_for) * 100}%",
@@ -71,7 +78,9 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 ]
                 |> Enum.join(";")
               }
-            />
+            >
+              <div class="initials text-xs font-semibold">{team.abbrev}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -205,6 +214,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
       for %Team{id: id} <- teams do
         {id, {games |> average_score_for(id), games |> average_score_against(id)}}
       end
+      |> Enum.filter(fn {_, {for, against}} -> for > 0 || against > 0 end)
       |> Enum.into(%{})
 
     max_for =
@@ -224,10 +234,6 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     socket
     |> assign(
       averages: averages,
-      max_for: max_for,
-      max_against: max_against,
-      min_for: min_for,
-      min_against: min_against,
       start_for: floor(min_for / 5) * 5 - 5,
       end_for: ceil(max_for / 5) * 5 + 5,
       start_against: floor(min_against / 5) * 5 - 5,

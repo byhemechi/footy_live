@@ -6,7 +6,7 @@
 @source "../js";
 @source "../../lib/footy_live_web";
 
-/* A Tailwind plugin that makes "hero-#{ICON}" classes available.
+/* A Tailwind plugin that makes "hero-#{ICON}" classes availaBRIe.
    The heroicons installation itself is managed by your mix.exs */
 @plugin "../vendor/heroicons";
 
@@ -114,4 +114,180 @@ body {
 body {
   display: grid;
   grid-template-rows: calc(var(--spacing) * 20) auto;
+}
+
+[data-club="ADE"] {
+  background: linear-gradient(
+    180deg,
+    #0f1432 60%,
+    #ff001e 0,
+    #ff001e 70%,
+    #fa0 0,
+    #fa0 80%,
+    #0f1432 0
+  );
+}
+
+[data-club="BRI"] {
+  background: linear-gradient(180deg, #255395 50%, #8b0042 0);
+}
+[data-club="CAR"] {
+  background: #031e2f;
+}
+[data-club="COL"] .initials {
+  background: #000;
+}
+[data-club="COL"] {
+  background: linear-gradient(
+    90deg,
+    #000 20%,
+    #fff 0,
+    #fff 40%,
+    #000 0,
+    #000 60%,
+    #fff 0,
+    #fff 80%,
+    #000 0
+  );
+}
+
+[data-club="ESS"] {
+  background: linear-gradient(124deg, #000 40%, #c90527 0, #c90527 60%, #000 0);
+}
+
+[data-club="FRE"] {
+  background: linear-gradient(
+    180deg,
+    #331c54 10%,
+    #fff 0,
+    #fff 15%,
+    #331c54 0,
+    #331c54 20%,
+    #fff 0,
+    #fff 25%,
+    #331c54 0,
+    #331c54 75%,
+    #fff 0,
+    #fff 80%,
+    #331c54 0,
+    #331c54 85%,
+    #fff 0,
+    #fff 90%,
+    #331c54 0
+  );
+}
+
+[data-club="GEE"] {
+  background: linear-gradient(
+    180deg,
+    #024 13.33%,
+    #fff 0,
+    #fff 26.66%,
+    #024 0,
+    #024 73.33%,
+    #fff 0,
+    #fff 86.66%,
+    #024 0
+  );
+}
+
+[data-club="GCS"] {
+  background: linear-gradient(180deg, #b00 73.33%, #fe0000 0, #fe0000);
+}
+
+[data-club="GWS"] {
+  background: linear-gradient(180deg, #313b42 40%, #ff7900 0);
+}
+[data-club="HAW"] .initials {
+  background: #512b1b;
+}
+[data-club="HAW"] {
+  background: linear-gradient(
+    90deg,
+    #512b1b 20%,
+    #fdc82f 0,
+    #fdc82f 40%,
+    #512b1b 0,
+    #512b1b 60%,
+    #fdc82f 0,
+    #fdc82f 80%,
+    #512b1b 0
+  );
+}
+
+[data-club="MEL"] {
+  background: #061a33;
+  background-image: url("https://www.afl.com.au/resources/v5.32.21/i/elements/melbourne-shape.svg");
+  background-size: 100%;
+  background-repeat: no-repeat;
+}
+[data-club="NOR"] .initials {
+  background: #003ca0;
+}
+[data-club="NOR"] {
+  background: linear-gradient(
+    90deg,
+    #003ca0 20%,
+    #fff 0,
+    #fff 40%,
+    #003ca0 0,
+    #003ca0 60%,
+    #fff 0,
+    #fff 80%,
+    #003ca0 0
+  );
+}
+
+[data-club="POR"] {
+  background: linear-gradient(
+    180deg,
+    #000 60%,
+    #008aab 0,
+    #008aab 70%,
+    #fff 0,
+    #fff 80%,
+    #000 0
+  );
+}
+[data-club="RIC"] .initials {
+  background: #000;
+}
+[data-club="RIC"] {
+  background: linear-gradient(124deg, #000 40%, #ffd300 0, #ffd300 60%, #000 0);
+}
+
+[data-club="STK"] {
+  background: linear-gradient(180deg, #ed1b2e 40%, #000 0);
+}
+
+[data-club="SYD"] {
+  background: #e1251b;
+  background-image: url("https://www.afl.com.au/resources/v5.32.21/i/elements/opera-house.svg");
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-size: 50%;
+}
+
+[data-club="WCE"] {
+  background: linear-gradient(
+    180deg,
+    #f2a900 20%,
+    #003087 0,
+    #003087 80%,
+    #f2a900 0
+  );
+}
+
+[data-club="WBD"] {
+  background: linear-gradient(
+    180deg,
+    #0039a6 60%,
+    #c60c30 0,
+    #c60c30 71.66%,
+    #0039a6 0,
+    #0039a6 76.66%,
+    #fff 0,
+    #fff 88.33%,
+    #0039a6 0
+  );
 }
