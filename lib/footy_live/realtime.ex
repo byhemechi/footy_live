@@ -36,7 +36,7 @@ defmodule FootyLive.Realtime do
     case game do
       %Squiggle.Game{} ->
         event["score"]
-        |> Enum.reduce(%Squiggle.Game{}, fn {k, v}, acc ->
+        |> Enum.reduce(game, fn {k, v}, acc ->
           acc |> Map.put(String.to_existing_atom(k), v)
         end)
         |> Map.put(:timestr, event["timestr"])
