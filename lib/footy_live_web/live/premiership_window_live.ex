@@ -127,7 +127,15 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               />
             </svg>
             <div
-              :for={team <- @teams}
+              :for={
+                team <-
+                  Enum.sort_by(@teams, fn team ->
+                    case @averages[team.id] do
+                      {s_for, s_against} -> s_for / s_against
+                      _ -> 0
+                    end
+                  end)
+              }
               :if={@averages[team.id]}
               src={"https://squiggle.com.au/" <> team.logo}
               id={"badge-#{team.abbrev}"}
@@ -137,6 +145,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 "flex items-center justify-center -translate-x-1/2 -translate-y-1/2 absolute",
                 case @averages[team.id] do
                   {s_for, s_against} when s_for / s_against >= 1.3 -> "ring ring-success"
+                  {s_for, s_against} when s_for / s_against >= 1.02 -> "ring ring-neutral"
                   {s_for, s_against} when s_for / s_against <= 0.69 -> "ring ring-error"
                   _ -> nil
                 end
