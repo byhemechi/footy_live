@@ -5,7 +5,7 @@ defmodule FootyLive.Realtime do
     pid = self()
 
     Task.start_link(fn ->
-      Req.get("https://api.squiggle.com.au/sse/test",
+      Req.get("https://api.squiggle.com.au/sse/events",
         into: fn {:data, data}, {req, res} ->
           buffer = Req.Request.get_private(req, :sse_buffer, "")
           {events, buffer} = ServerSentEvents.parse(buffer <> data)

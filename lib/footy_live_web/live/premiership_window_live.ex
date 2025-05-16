@@ -296,7 +296,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
 
   def handle_info({:games_updated, games}, socket) do
     teams = socket.assigns.teams
-    {:noreply, calculate_and_assign_stats(socket, teams, games)}
+    {:noreply, calculate_and_assign_stats(socket, teams, games, socket.assigns.round)}
   end
 
   defp calculate_and_assign_stats(socket, teams, games, max_round \\ :infinity) do
