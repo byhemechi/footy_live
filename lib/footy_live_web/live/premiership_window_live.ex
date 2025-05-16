@@ -61,8 +61,6 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
             <div class="absolute bg-error/10 size-1/3 bottom-0 left-0 text-error/50 grid place-content-center" />
             <img
               :for={team <- @teams}
-              x={(@averages[team.id] |> elem(0)) - 1.5}
-              y={(@averages[team.id] |> elem(1)) - 1.5}
               src={"https://live.squiggle.com.au/" <> team.name <> ".png"}
               id={"badge-#{team.id}"}
               class="size-10 transition-all -translate-x-1/2 -translate-y-1/2 absolute bg-base-300 shadow rounded-full object-cover"
@@ -78,6 +76,16 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
         </div>
       </div>
     </Layouts.app>
+
+    <div class="tabs tabs-box items-center justify-center max-w-max mx-auto my-4">
+      <.link
+        :for={round <- @rounds}
+        class={["tab transition-all", @round == round && "tab-active"]}
+        patch={~p"/premiership_window?round=#{round}"}
+      >
+        {round}
+      </.link>
+    </div>
     """
   end
 
@@ -111,7 +119,12 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     average_score_for(tail, team_id, running_count + score, total_games + complete)
   end
 
+  def average_score_for([], _team_id, _running_count, total_games) when total_games <= 0 do
+    0
+  end
+
   def average_score_for([], _team_id, running_count, total_games) do
+    IO.inspect({running_count, total_games})
     running_count / total_games
   end
 
@@ -131,6 +144,10 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     average_score_against(tail, team_id, running_count + score, total_games + complete)
   end
 
+  def average_score_against([], _team_id, _running_count, total_games) when total_games <= 0 do
+    0
+  end
+
   def average_score_against([], _team_id, running_count, total_games) do
     running_count / total_games
   end
@@ -140,14 +157,32 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
       Phoenix.PubSub.subscribe(FootyLive.PubSub, @topic)
     end
 
+    {:ok,
+     socket
+     |> assign(:route, :premiership_window)
+     |> assign(:rounds, FootyLive.Games.list_rounds())}
+  end
+
+  def handle_params(params, _uri, socket) do
+    round =
+      case params do
+        %{"round" => round} ->
+          {round, _} = Integer.parse(round)
+
+          round
+
+        _ ->
+          FootyLive.Games.list_rounds() |> Enum.at(-1)
+      end
+
     teams = FootyLive.Teams.list_teams()
     games = FootyLive.Games.list_games()
 
-    {:ok,
+    {:noreply,
      socket
+     |> calculate_and_assign_stats(teams, games, round)
      |> assign(:teams, teams)
-     |> assign(:route, :premiership_window)
-     |> calculate_and_assign_stats(teams, games)}
+     |> assign(:round, round)}
   end
 
   def handle_info({:games_updated, games}, socket) do
@@ -155,7 +190,16 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     {:noreply, calculate_and_assign_stats(socket, teams, games)}
   end
 
-  defp calculate_and_assign_stats(socket, teams, games) do
+  defp calculate_and_assign_stats(socket, teams, games, max_round \\ :infinity) do
+    games =
+      case max_round do
+        _ when is_integer(max_round) ->
+          games |> Enum.filter(&(&1.round <= max_round))
+
+        _ ->
+          games
+      end
+
     averages =
       for %Team{id: id} <- teams do
         {id, {games |> average_score_for(id), games |> average_score_against(id)}}
