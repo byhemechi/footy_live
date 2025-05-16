@@ -189,6 +189,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     <div class="tabs tabs-box items-center justify-center max-w-max mx-auto my-4">
       <.link
         :for={round <- @rounds}
+        :if={round}
         class={["tab transition-all", @round == round && "tab-active"]}
         patch={~p"/premiership_window?round=#{round}"}
       >
@@ -324,11 +325,11 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
 
     min_for =
       averages
-      |> Enum.reduce(150, fn {_id, {for, _against}}, current -> min(for, current) end)
+      |> Enum.reduce(250, fn {_id, {for, _against}}, current -> min(for, current) end)
 
     min_against =
       averages
-      |> Enum.reduce(150, fn {_id, {_for, against}}, current -> min(against, current) end)
+      |> Enum.reduce(250, fn {_id, {_for, against}}, current -> min(against, current) end)
 
     socket
     |> assign(

@@ -48,6 +48,7 @@ defmodule FootyLiveWeb.GamesLive do
         <div class="tabs tabs-box">
           <.link
             :for={round <- @rounds}
+            :if={round}
             class={["tab", @round == round && "tab-active"]}
             patch={~p"/games?round=#{round}"}
           >
