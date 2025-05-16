@@ -24,7 +24,10 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               :if={n > @start_for && n < @end_for}
               }
               id={"tick-x-#{n}"}
-              class="-translate-x-1/2 bottom-0 text-base-content/30 absolute transition-all"
+              class={[
+                "-translate-x-1/2 bottom-0 text-base-content/30 absolute transition-all",
+                rem(n, 10) > 0 && "hidden min-[350px]:block"
+              ]}
               style={ "left: #{(n - @start_for) / (@end_for - @start_for) * 100}%"}
             >
               {n}
@@ -35,7 +38,10 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               :for={n <- @start_against..@end_against//5}
               :if={n > @start_against && n < @end_against}
               id={"tick-y-#{n}"}
-              class="right-0 transition-all [writing-mode:vertical-lr] rotate-180 -translate-y-1/2 text-base-content/30 absolute"
+              class={[
+                "right-0 transition-all [writing-mode:vertical-lr] rotate-180 -translate-y-1/2 text-base-content/30 absolute",
+                rem(n, 10) > 0 && "hidden min-[350px]:block"
+              ]}
               style={ "top: #{(n - @start_against) / (@end_against - @start_against) * 100}%"}
             >
               {n}
@@ -46,14 +52,20 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <div
                 :for={n <- @start_for..@end_for//5}
                 :if={n > @start_for && n < @end_for}
-                class="w-px h-full bg-base-300 absolute transition-all"
+                class={[
+                  "w-px h-full bg-base-300 absolute transition-all",
+                  rem(n, 10) > 0 && "opacity-25 min-[350px]:opacity-100"
+                ]}
                 id={"line-x-#{n}"}
                 style={ "left: #{(n - @start_for) / (@end_for - @start_for) * 100}%"}
               />
               <div
                 :for={n <- @start_against..@end_against//5}
                 :if={n > @start_against && n < @end_against}
-                class="h-px w-full bg-base-300 absolute transition-all"
+                class={[
+                  "h-px w-full bg-base-300 absolute transition-all",
+                  rem(n, 10) > 0 && "opacity-25 min-[350px]:opacity-100"
+                ]}
                 id={"line-y-#{n}"}
                 style={ "top: #{(n - @start_against) / (@end_against - @start_against) * 100}%"}
               />
@@ -133,7 +145,6 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
   end
 
   def average_score_for([], _team_id, running_count, total_games) do
-    IO.inspect({running_count, total_games})
     running_count / total_games
   end
 
