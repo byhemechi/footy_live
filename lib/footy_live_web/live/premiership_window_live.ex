@@ -299,7 +299,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     {:noreply, calculate_and_assign_stats(socket, teams, games, socket.assigns.round)}
   end
 
-  defp calculate_and_assign_stats(socket, teams, games, max_round \\ :infinity) do
+  defp calculate_and_assign_stats(socket, teams, games, max_round) do
     games =
       case max_round do
         _ when is_integer(max_round) ->

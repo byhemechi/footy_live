@@ -55,8 +55,7 @@ defmodule FootyLive.Realtime do
     {:noreply, state}
   end
 
-  def handle_info({:squiggle_event, event}, state) do
-    IO.inspect(event, label: "event")
+  def handle_info({:squiggle_event, _event}, state) do
     {:noreply, state}
   end
 
