@@ -18,6 +18,7 @@ defmodule FootyLiveWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/healthz", HealthCheckController, :healthz
     live "/games", GamesLive
     live "/teams", TeamsLive
     live "/teams/:team_id", TeamProfileLive
