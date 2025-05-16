@@ -50,6 +50,17 @@ defmodule FootyLive.Realtime do
     {:noreply, state}
   end
 
+  def handle_info({:squiggle_event, %{event: "game", data: event}}, state) do
+    event =
+      Jason.decode!(event)
+      |> Enum.map(fn {k, v} -> {String.to_existing_atom(k), v} end)
+
+    struct(Squiggle.Game, event)
+    |> FootyLive.Games.put_game()
+
+    {:noreply, state}
+  end
+
   def handle_info({:squiggle_event, %{event: "message", data: message_data}}, state) do
     IO.inspect(Jason.decode!(message_data), label: "Message from Squiggle")
     {:noreply, state}
