@@ -77,7 +77,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                   ]
                   |> Enum.join("\n")
                 }
-                class="fill-warning/20 transition-all"
+                class="fill-warning/15 transition-all"
               />
               <path
                 d={
@@ -192,7 +192,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
         :for={round <- @rounds}
         :if={round}
         class={["tab transition-all", @round == round && "tab-active"]}
-        navigate={~p"/premiership_window?round=#{round}"}
+        patch={~p"/premiership_window?round=#{round}"}
+        phx-click="set_round"
       >
         {round}
       </.link>
@@ -267,6 +268,17 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
       Phoenix.PubSub.subscribe(FootyLive.PubSub, @topic)
     end
 
+    teams = FootyLive.Teams.list_teams()
+
+    {:ok,
+     socket
+     |> assign(:route, :premiership_window)
+     |> assign(:page_title, "Percentage Chart")
+     |> assign(:rounds, FootyLive.Games.list_rounds())
+     |> assign(:teams, teams)}
+  end
+
+  def handle_params(params, uri, socket) do
     round =
       case params do
         %{"round" => round} ->
@@ -278,17 +290,12 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
           FootyLive.Games.list_rounds() |> Enum.at(-1)
       end
 
-    teams = FootyLive.Teams.list_teams()
     games = FootyLive.Games.list_games()
 
-    {:ok,
+    {:noreply,
      socket
-     |> assign(:route, :premiership_window)
-     |> assign(:page_title, "Percentage Chart")
-     |> assign(:rounds, FootyLive.Games.list_rounds())
-     |> calculate_and_assign_stats(teams, games, round)
-     |> assign(:teams, teams)
-     |> assign(:round, round)}
+     |> assign(round: round)
+     |> calculate_and_assign_stats(socket.assigns.teams, games, round)}
   end
 
   def handle_info({:games_updated, games}, socket) do
@@ -344,19 +351,29 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
         _ -> teams
       end
 
-    socket
-    |> assign(
-      start_for: floor(min_for / 5) * 5 - 5,
-      end_for: ceil(max_for / 5) * 5 + 5,
-      start_against: floor(min_against / 5) * 5 - 5,
-      end_against: ceil(max_against / 5) * 5 + 5
-    )
-    |> stream(
-      :teams,
-      for team <- teams do
-        {team, averages[team.id]}
-      end,
-      dom_id: fn {team, _averages} -> "team-#{team.id}" end
+    socket =
+      socket
+      |> assign(
+        start_for: floor(min_for / 5) * 5 - 5,
+        end_for: ceil(max_for / 5) * 5 + 5,
+        start_against: floor(min_against / 5) * 5 - 5,
+        end_against: ceil(max_against / 5) * 5 + 5
+      )
+      |> stream(
+        :teams,
+        for team <- teams do
+          {team, averages[team.id]}
+        end,
+        dom_id: fn {team, _averages} -> "team-#{team.id}" end
+      )
+
+    teams
+    |> Enum.filter(&is_nil(averages[&1.id]))
+    |> Enum.reduce(
+      socket,
+      fn team, acc ->
+        acc |> stream_delete_by_dom_id(:teams, "team-#{team.id}")
+      end
     )
   end
 end
