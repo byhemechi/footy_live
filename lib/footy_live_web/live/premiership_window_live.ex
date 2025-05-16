@@ -48,30 +48,84 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
             </div>
           </div>
           <div class="w-full h-full relative row-start-1 col-start-3 border-base-300 border overflow-hidden bg-base-100 rounded-lg">
-            <div id="lines" class="contents">
-              <div
-                :for={n <- @start_for..@end_for//5}
-                :if={n > @start_for && n < @end_for}
-                class={[
-                  "w-px h-full bg-base-300 absolute transition-all",
-                  rem(n, 10) > 0 && "opacity-25 min-[350px]:opacity-100"
-                ]}
-                id={"line-x-#{n}"}
-                style={ "left: #{(n - @start_for) / (@end_for - @start_for) * 100}%"}
+            <svg class="size-full absolute inset-0" preserveAspectRatio="none" viewbox="0 0 1 1">
+              <g id="lines">
+                <path
+                  :for={n <- @start_for..@end_for//5}
+                  :if={n > @start_for && n < @end_for}
+                  class="stroke-base-300 transition-all"
+                  vector-effect="non-scaling-stroke"
+                  id={"line-x-#{n}"}
+                  d={ "M #{(n - @start_for) / (@end_for - @start_for)},0 l 0,1"}
+                />
+                <path
+                  :for={n <- @start_against..@end_against//5}
+                  :if={n > @start_against && n < @end_against}
+                  class="stroke-base-300 transition-all"
+                  vector-effect="non-scaling-stroke"
+                  id={"line-y-#{n}"}
+                  d={ "M 0,#{(n - @start_against) / (@end_against - @start_against)} l 1,0"}
+                />
+              </g>
+              <path
+                d={
+                  [
+                    "M #{(@start_against * 1.3 - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / 1.3 - @start_against) / (@end_against - @start_against)}",
+                    "L 1 0"
+                  ]
+                  |> Enum.join("\n")
+                }
+                class="fill-success/20 transition-all"
               />
-              <div
-                :for={n <- @start_against..@end_against//5}
-                :if={n > @start_against && n < @end_against}
-                class={[
-                  "h-px w-full bg-base-300 absolute transition-all",
-                  rem(n, 10) > 0 && "opacity-25 min-[350px]:opacity-100"
-                ]}
-                id={"line-y-#{n}"}
-                style={ "top: #{(n - @start_against) / (@end_against - @start_against) * 100}%"}
+              <path
+                d={
+                  [
+                    "M #{(@start_against * 1.3 - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / 1.3 - @start_against) / (@end_against - @start_against)}"
+                  ]
+                  |> Enum.join("\n")
+                }
+                class="fill-transparent transition-all stroke-success stroke-2"
+                vector-effect="non-scaling-stroke"
               />
-            </div>
-            <div class="absolute bg-success/10 size-1/3 top-0 right-0 grid place-content-center text-success/50" />
-            <div class="absolute bg-error/10 size-1/3 bottom-0 left-0 text-error/50 grid place-content-center" />
+              <path
+                d={
+                  [
+                    "M #{(@start_against * 1.02 - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / 1.02 - @start_against) / (@end_against - @start_against)}"
+                  ]
+                  |> Enum.join("\n")
+                }
+                class="fill-transparent transition-all stroke-neutral stroke-2"
+                vector-effect="non-scaling-stroke"
+                stroke-dasharray="20"
+              />
+
+              <path
+                d={
+                  [
+                    "M 0,#{(@start_for / 0.69 - @start_against) / (@end_against - @start_against)}",
+                    "L #{(@end_against * 0.69 - @start_for) / (@end_for - @start_for)},1",
+                    "L 0,1",
+                    "z"
+                  ]
+                  |> Enum.join("\n")
+                }
+                class="fill-error/20 transition-all"
+              />
+              <path
+                d={
+                  [
+                    "M 0,#{(@start_for / 0.69 - @start_against) / (@end_against - @start_against)}",
+                    "L #{(@end_against * 0.69 - @start_for) / (@end_for - @start_for)},1"
+                  ]
+                  |> Enum.join("\n")
+                }
+                class="fill-transparent transition-all stroke-error stroke-2"
+                vector-effect="non-scaling-stroke"
+              />
+            </svg>
             <div
               :for={team <- @teams}
               :if={@averages[team.id]}
