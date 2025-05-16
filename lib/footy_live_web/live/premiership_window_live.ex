@@ -324,11 +324,11 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
 
     min_for =
       averages
-      |> Enum.reduce(:infinity, fn {_id, {for, _against}}, current -> min(for, current) end)
+      |> Enum.reduce(150, fn {_id, {for, _against}}, current -> min(for, current) end)
 
     min_against =
       averages
-      |> Enum.reduce(:infinity, fn {_id, {_for, against}}, current -> min(against, current) end)
+      |> Enum.reduce(150, fn {_id, {_for, against}}, current -> min(against, current) end)
 
     socket
     |> assign(
