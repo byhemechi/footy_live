@@ -291,3 +291,7 @@ body {
     #0039a6 0
   );
 }
+
+[data-browser="chrome"] .chrome-fix-width {
+  stroke-width: var(--chrome-stroke-width);
+}

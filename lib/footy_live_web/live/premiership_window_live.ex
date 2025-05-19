@@ -60,13 +60,6 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 translate_x = @start_for / 5
                 translate_y = @start_against / 5 %>
 
-                <style>
-                  @-moz-document url-prefix() {
-                    .moz-reset-width {
-                      stroke-width: 1px !important;
-                    }
-                  }
-                </style>
                 <pattern
                   id="grid"
                   width="1"
@@ -77,15 +70,15 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 >
                   <path
                     d="M 1 0 l 0 1"
-                    class="stroke-base-300 moz-reset-width"
+                    class="stroke-base-300 moz-reset-width chrome-fix-width"
                     vector-effect="non-scaling-stroke"
-                    stroke-width={scale_x}
+                    style={"--chrome-stroke-width: #{scale_x}px"}
                   />
                   <path
                     d="M 0 1 L 1 1"
-                    class="stroke-base-300 moz-reset-width"
+                    class="stroke-base-300 moz-reset-width chrome-fix-width"
                     vector-effect="non-scaling-stroke"
-                    stroke-width={scale_y}
+                    style={"--chrome-stroke-width: #{scale_y}px"}
                   />
                 </pattern>
               </defs>
