@@ -48,7 +48,12 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
             </div>
           </div>
           <div class="w-full h-full relative row-start-1 col-start-3 border-base-300 border overflow-hidden bg-base-100 rounded-lg isolate">
-            <svg class="size-full absolute inset-0" preserveAspectRatio="none" viewbox="0 0 1 1">
+            <svg
+              class="size-full absolute inset-0"
+              preserveAspectRatio="none"
+              viewbox="0 0 1 1"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <defs>
                 <% scale_x = (@end_for - @start_for) / 5
                 scale_y = (@end_against - @start_against) / 5
@@ -67,11 +72,11 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                   width="1"
                   height="1"
                   patternUnits="userSpaceOnUse"
+                  patternTransform={"scale(#{1/scale_x} #{1/scale_y}) translate(#{-translate_x} #{-translate_y})"}
                   class="transition-transform"
-                  style={"transform: scaleX(#{1/scale_x}) scaleY(#{1/scale_y}) translate(#{-translate_x}px, #{-translate_y}px)"}
                 >
                   <path
-                    d="M 1 0 L 1 1"
+                    d="M 1 0 l 0 1"
                     class="stroke-base-300 moz-reset-width"
                     vector-effect="non-scaling-stroke"
                     stroke-width={scale_x}
@@ -85,7 +90,6 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 </pattern>
               </defs>
 
-              <%!-- Background grid using pattern --%>
               <rect width="1" height="1" fill="url(#grid)" class="transition-all" />
               <path
                 d={
@@ -172,17 +176,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 d={
                   [
                     "M #{(@avg_points_for - @start_for) / (@end_for - @start_for)} 0",
-                    "l 0 1"
-                  ]
-                  |> Enum.join(" ")
-                }
-                class="stroke-neutral stroke-2 transition-all"
-                vector-effect="non-scaling-stroke"
-                stroke-dasharray="8"
-              />
-              <path
-                d={
-                  [
+                    "l 0 1",
                     "M 0 #{(@avg_points_against - @start_against) / (@end_against - @start_against)}",
                     "l 1 0"
                   ]
@@ -223,23 +217,6 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 }
               >
                 <div class="initials text-xs font-semibold">{team.abbrev}</div>
-              </div>
-              <div
-                id="team-average"
-                title={"Average: #{@avg_points_for} for, #{@avg_points_against} against"}
-                class={[
-                  "size-9 transition-all rounded-xl shadow bg-base-200 text-base-content",
-                  "flex items-center justify-center -translate-x-1/2 -translate-y-1/2 absolute"
-                ]}
-                style={
-                  [
-                    "left: #{(@avg_points_for - @start_for) / (@end_for - @start_for) * 100}%",
-                    "top: #{(@avg_points_against - @start_against) / (@end_against - @start_against) * 100}%"
-                  ]
-                  |> Enum.join(";")
-                }
-              >
-                <div class="initials text-xs font-semibold">AVG</div>
               </div>
             </div>
           </div>
