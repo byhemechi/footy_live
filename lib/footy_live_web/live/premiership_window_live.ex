@@ -69,13 +69,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                   class="transition-transform"
                 >
                   <path
-                    d="M 1 0 l 0 1"
-                    class="stroke-base-300 moz-reset-width chrome-fix-width"
-                    vector-effect="non-scaling-stroke"
-                    style={"--chrome-stroke-width: #{scale_x}px"}
-                  />
-                  <path
-                    d="M 0 1 L 1 1"
+                    d="M 1 0 l 0 1 M 0 1 L 1 1"
                     class="stroke-base-300 moz-reset-width chrome-fix-width"
                     vector-effect="non-scaling-stroke"
                     style={"--chrome-stroke-width: #{scale_y}px"}
