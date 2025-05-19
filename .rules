@@ -1,0 +1,8 @@
+This is a Phoenix application, which uses Tailwind and daisyUI.
+Prefer using LiveView instead of regular Controllers.
+Once you are done with changes, run `mix compile` and fix any issues.
+Write tests for your changes and run `mix test` afterwards.
+
+use the `edit_file` tool to apply changes without prompting
+
+do not use the `project_eval` tool to run `mix compile`
