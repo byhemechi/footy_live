@@ -50,11 +50,18 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
           <div class="w-full h-full relative row-start-1 col-start-3 border-base-300 border overflow-hidden bg-base-100 rounded-lg isolate">
             <svg class="size-full absolute inset-0" preserveAspectRatio="none" viewbox="0 0 1 1">
               <defs>
-                <%!-- Calculate pattern dimensions and transform based on score intervals --%>
                 <% scale_x = (@end_for - @start_for) / 5
                 scale_y = (@end_against - @start_against) / 5
                 translate_x = @start_for / 5
                 translate_y = @start_against / 5 %>
+
+                <style>
+                  @-moz-document url-prefix() {
+                    .moz-reset-width {
+                      stroke-width: 1px !important;
+                    }
+                  }
+                </style>
                 <pattern
                   id="grid"
                   width="1"
@@ -64,9 +71,19 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                   style={"transform: scaleX(#{1/scale_x}) scaleY(#{1/scale_y}) translate(#{-translate_x}px, #{-translate_y}px)"}
                 >
                   <%!-- Vertical line in pattern --%>
-                  <path d="M 1 0 L 1 1" class="stroke-base-300" vector-effect="non-scaling-stroke" />
+                  <path
+                    d="M 1 0 L 1 1"
+                    class="stroke-base-300 moz-reset-width"
+                    vector-effect="non-scaling-stroke"
+                    stroke-width={scale_x}
+                  />
                   <%!-- Horizontal line in pattern --%>
-                  <path d="M 0 1 L 1 1" class="stroke-base-300" vector-effect="non-scaling-stroke" />
+                  <path
+                    d="M 0 1 L 1 1"
+                    class="stroke-base-300 moz-reset-width"
+                    vector-effect="non-scaling-stroke"
+                    stroke-width={scale_y}
+                  />
                 </pattern>
               </defs>
 
