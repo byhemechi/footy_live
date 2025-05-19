@@ -142,7 +142,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                   ]
                   |> Enum.join("\n")
                 }
-                class="fill-transparent transition-all stroke-neutral stroke-2"
+                class="fill-transparent transition-all stroke-info stroke-2"
                 vector-effect="non-scaling-stroke"
                 stroke-dasharray="20"
               />
@@ -169,6 +169,26 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 }
                 class="fill-transparent transition-all stroke-error stroke-2"
                 vector-effect="non-scaling-stroke"
+              />
+              <%!-- Average points for line --%>
+              <line
+                x1={(@avg_points_for - @start_for) / (@end_for - @start_for)}
+                x2={(@avg_points_for - @start_for) / (@end_for - @start_for)}
+                y1="0"
+                y2="1"
+                class="stroke-neutral stroke-2"
+                vector-effect="non-scaling-stroke"
+                stroke-dasharray="8"
+              />
+              <%!-- Average points against line --%>
+              <line
+                x1="0"
+                x2="1"
+                y1={(@avg_points_against - @start_against) / (@end_against - @start_against)}
+                y2={(@avg_points_against - @start_against) / (@end_against - @start_against)}
+                class="stroke-neutral stroke-2"
+                vector-effect="non-scaling-stroke"
+                stroke-dasharray="8"
               />
             </svg>
             <div class="contents" id="teams" phx-update="stream">
@@ -335,6 +355,21 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
      ])}
   end
 
+  defp calculate_averages(averages) do
+    {total_for, total_against, count} =
+      averages
+      |> Map.values()
+      |> Enum.reduce({0, 0, 0}, fn {for_score, against_score},
+                                   {total_for, total_against, count} ->
+        {total_for + for_score, total_against + against_score, count + 1}
+      end)
+
+    avg_points_for = if count > 0, do: total_for / count, else: 0
+    avg_points_against = if count > 0, do: total_against / count, else: 0
+
+    {avg_points_for, avg_points_against}
+  end
+
   defp calculate_and_assign_stats(socket, teams, games, max_round, team_ids \\ nil) do
     games =
       case max_round do
@@ -372,13 +407,17 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
         _ -> teams
       end
 
+    {avg_points_for, avg_points_against} = calculate_averages(averages)
+
     socket =
       socket
       |> assign(
         start_for: floor(min_for / 5) * 5 - 5,
         end_for: ceil(max_for / 5) * 5 + 5,
         start_against: floor(min_against / 5) * 5 - 5,
-        end_against: ceil(max_against / 5) * 5 + 5
+        end_against: ceil(max_against / 5) * 5 + 5,
+        avg_points_for: avg_points_for,
+        avg_points_against: avg_points_against
       )
       |> stream(
         :teams,
