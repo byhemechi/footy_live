@@ -70,14 +70,12 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                   class="transition-transform"
                   style={"transform: scaleX(#{1/scale_x}) scaleY(#{1/scale_y}) translate(#{-translate_x}px, #{-translate_y}px)"}
                 >
-                  <%!-- Vertical line in pattern --%>
                   <path
                     d="M 1 0 L 1 1"
                     class="stroke-base-300 moz-reset-width"
                     vector-effect="non-scaling-stroke"
                     stroke-width={scale_x}
                   />
-                  <%!-- Horizontal line in pattern --%>
                   <path
                     d="M 0 1 L 1 1"
                     class="stroke-base-300 moz-reset-width"
@@ -170,23 +168,27 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 class="fill-transparent transition-all stroke-error stroke-2"
                 vector-effect="non-scaling-stroke"
               />
-              <%!-- Average points for line --%>
-              <line
-                x1={(@avg_points_for - @start_for) / (@end_for - @start_for)}
-                x2={(@avg_points_for - @start_for) / (@end_for - @start_for)}
-                y1="0"
-                y2="1"
-                class="stroke-neutral stroke-2"
+              <path
+                d={
+                  [
+                    "M #{(@avg_points_for - @start_for) / (@end_for - @start_for)} 0",
+                    "l 0 1"
+                  ]
+                  |> Enum.join(" ")
+                }
+                class="stroke-neutral stroke-2 transition-all"
                 vector-effect="non-scaling-stroke"
                 stroke-dasharray="8"
               />
-              <%!-- Average points against line --%>
-              <line
-                x1="0"
-                x2="1"
-                y1={(@avg_points_against - @start_against) / (@end_against - @start_against)}
-                y2={(@avg_points_against - @start_against) / (@end_against - @start_against)}
-                class="stroke-neutral stroke-2"
+              <path
+                d={
+                  [
+                    "M 0 #{(@avg_points_against - @start_against) / (@end_against - @start_against)}",
+                    "l 1 0"
+                  ]
+                  |> Enum.join(" ")
+                }
+                class="stroke-neutral stroke-2 transition-all"
                 vector-effect="non-scaling-stroke"
                 stroke-dasharray="8"
               />
@@ -197,7 +199,6 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                   {dom_id, {team, {s_for, s_against}}} <-
                     @streams.teams
                 }
-                src={"https://squiggle.com.au/" <> team.logo}
                 id={dom_id}
                 title={"#{team.name}: #{s_for |> :erlang.float_to_binary(decimals: 1)} for, #{s_against  |> :erlang.float_to_binary(decimals: 1)} against"}
                 class={[
@@ -222,6 +223,23 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 }
               >
                 <div class="initials text-xs font-semibold">{team.abbrev}</div>
+              </div>
+              <div
+                id="team-average"
+                title={"Average: #{@avg_points_for} for, #{@avg_points_against} against"}
+                class={[
+                  "size-9 transition-all rounded-xl shadow bg-base-200 text-base-content",
+                  "flex items-center justify-center -translate-x-1/2 -translate-y-1/2 absolute"
+                ]}
+                style={
+                  [
+                    "left: #{(@avg_points_for - @start_for) / (@end_for - @start_for) * 100}%",
+                    "top: #{(@avg_points_against - @start_against) / (@end_against - @start_against) * 100}%"
+                  ]
+                  |> Enum.join(";")
+                }
+              >
+                <div class="initials text-xs font-semibold">AVG</div>
               </div>
             </div>
           </div>
