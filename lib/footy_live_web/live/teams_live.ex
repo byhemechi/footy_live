@@ -19,7 +19,7 @@ defmodule FootyLiveWeb.TeamsLive do
   end
 
   @impl true
-  def render(%{teams: teams} = assigns) do
+  def render(assigns) do
     ~H"""
     <Layouts.app {assigns}>
       <div class="px-4 sm:px-6 lg:px-8">
@@ -35,7 +35,7 @@ defmodule FootyLiveWeb.TeamsLive do
         <div class="mt-8 flow-root">
           <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-              <.table id="teams" rows={teams}>
+              <.table id="teams" rows={@teams}>
                 <:col :let={team} label="ID">{team.id}</:col>
                 <:col :let={team} label="Name">
                   <.link navigate={~p"/teams/#{team.id}"} class="text-blue-600 hover:underline">

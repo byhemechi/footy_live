@@ -49,24 +49,29 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
           </div>
           <div class="w-full h-full relative row-start-1 col-start-3 border-base-300 border overflow-hidden bg-base-100 rounded-lg isolate">
             <svg class="size-full absolute inset-0" preserveAspectRatio="none" viewbox="0 0 1 1">
-              <g id="lines">
-                <path
-                  :for={n <- @start_for..@end_for//5}
-                  :if={n > @start_for && n < @end_for}
-                  class="stroke-base-300 transition-all"
-                  vector-effect="non-scaling-stroke"
-                  id={"line-x-#{n}"}
-                  d={ "M #{(n - @start_for) / (@end_for - @start_for)},0 l 0,1"}
-                />
-                <path
-                  :for={n <- @start_against..@end_against//5}
-                  :if={n > @start_against && n < @end_against}
-                  class="stroke-base-300 transition-all"
-                  vector-effect="non-scaling-stroke"
-                  id={"line-y-#{n}"}
-                  d={ "M 0,#{(n - @start_against) / (@end_against - @start_against)} l 1,0"}
-                />
-              </g>
+              <defs>
+                <%!-- Calculate pattern dimensions and transform based on score intervals --%>
+                <% scale_x = (@end_for - @start_for) / 5
+                scale_y = (@end_against - @start_against) / 5
+                translate_x = @start_for / 5
+                translate_y = @start_against / 5 %>
+                <pattern
+                  id="grid"
+                  width="1"
+                  height="1"
+                  patternUnits="userSpaceOnUse"
+                  class="transition-transform"
+                  style={"transform: scaleX(#{1/scale_x}) scaleY(#{1/scale_y}) translate(#{-translate_x}px, #{-translate_y}px)"}
+                >
+                  <%!-- Vertical line in pattern --%>
+                  <path d="M 1 0 L 1 1" class="stroke-base-300" vector-effect="non-scaling-stroke" />
+                  <%!-- Horizontal line in pattern --%>
+                  <path d="M 0 1 L 1 1" class="stroke-base-300" vector-effect="non-scaling-stroke" />
+                </pattern>
+              </defs>
+
+              <%!-- Background grid using pattern --%>
+              <rect width="1" height="1" fill="url(#grid)" class="transition-all" />
               <path
                 d={
                   [
@@ -262,7 +267,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     running_count / total_games
   end
 
-  def mount(params, _, socket) do
+  def mount(_params, _, socket) do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(FootyLive.PubSub, @topic)
     end
@@ -277,7 +282,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
      |> assign(:teams, teams)}
   end
 
-  def handle_params(params, uri, socket) do
+  def handle_params(params, _uri, socket) do
     round =
       case params do
         %{"round" => round} ->
