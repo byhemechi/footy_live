@@ -11,6 +11,16 @@
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <link rel="shortcut icon" href={~p"/images/foomtbal.svg"} />
+    <script
+      :if={
+        Application.fetch_env!(:footy_live, :umami_site_id) &&
+          Application.fetch_env!(:footy_live, :umami_host)
+      }
+      defer
+      src={"#{Application.fetch_env!(:footy_live, :umami_host)}/script.js"}
+      data-website-id={Application.fetch_env!(:footy_live, :umami_site_id)}
+    >
+    </script>
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
     <script>

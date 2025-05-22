@@ -11,8 +11,16 @@ dets_path =
   System.get_env("FOOTY_LIVE_DB_PATH") ||
     Application.app_dir(:footy_live, "priv/db")
 
+umami_host =
+  System.get_env("UMAMI_HOST")
+
+umami_site_id =
+  System.get_env("UMAMI_ID")
+
 config :footy_live,
-  dets_path: dets_path
+  dets_path: dets_path,
+  umami_host: umami_host,
+  umami_site_id: umami_site_id
 
 # ## Using releases
 #
