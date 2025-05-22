@@ -36,7 +36,7 @@ defmodule FootyLive.Teams do
   Get a team by ID.
   """
   def get(team_id) when is_integer(team_id) do
-    case :ets.lookup(table_name(), team_id) do
+    case :dets.lookup(table_name(), team_id) do
       [{^team_id, team}] -> team
       [] -> nil
     end
@@ -80,7 +80,7 @@ defmodule FootyLive.Teams do
     table_name = table_name(opts)
     path = Path.join(Application.fetch_env!(:footy_live, :dets_path), "#{table_name}.dets")
     File.mkdir_p!(Path.dirname(path))
-    {:ok, table} = :dets.open_file(table_name, [file: String.to_charlist(path), type: :set])
+    {:ok, table} = :dets.open_file(table_name, file: String.to_charlist(path), type: :set)
 
     {:ok, %{table: table, timer: nil, name: opts[:name]}}
   end
