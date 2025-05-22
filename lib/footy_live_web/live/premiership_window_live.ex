@@ -211,12 +211,25 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
       </div>
     </Layouts.app>
 
-    <div class="tabs tabs-box items-center justify-center max-w-max mx-auto my-4">
+    <div class="tabs tabs-box items-center justify-center max-w-max mx-auto my-4 pr-2">
+      <details class="dropdown dropdown-top">
+        <summary class="btn m-1">{@year}<.icon name="hero-chevron-up" /></summary>
+
+        <div class="tabs tabs-box items-center justify-center max-w-max mx-auto my-4 dropdown-content">
+          <.link
+            :for={year <- @years}
+            class={["tab w-full transition-all", @year == year && "tab-active"]}
+            patch={~p"/premiership_window?year=#{year}"}
+          >
+            {year}
+          </.link>
+        </div>
+      </details>
       <.link
         :for={round <- @rounds}
         :if={round}
         class={["tab transition-all", @round == round && "tab-active"]}
-        patch={~p"/premiership_window?round=#{round}"}
+        patch={~p"/premiership_window?round=#{round}&year=#{@year}"}
       >
         {round}
       </.link>
@@ -297,11 +310,23 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
      socket
      |> assign(:route, :premiership_window)
      |> assign(:page_title, "Percentage Chart")
-     |> assign(:rounds, FootyLive.Games.list_rounds())
+     |> assign(:years, FootyLive.Games.list_years())
      |> assign(:teams, teams)}
   end
 
   def handle_params(params, _uri, socket) do
+    year =
+      case params do
+        %{"year" => year} ->
+          {year, _} = Integer.parse(year)
+          year
+
+        _ ->
+          DateTime.utc_now().year
+      end
+
+    rounds = FootyLive.Games.list_rounds(year)
+
     round =
       case params do
         %{"round" => round} ->
@@ -310,31 +335,47 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
           round
 
         _ ->
-          FootyLive.Games.list_rounds() |> Enum.at(-1)
+          rounds |> Enum.at(-1)
       end
 
-    games = FootyLive.Games.list_games()
+    games = FootyLive.Games.list_games(year: year)
 
     {:noreply,
      socket
-     |> assign(round: round)
+     |> assign(round: round, year: year, rounds: rounds)
      |> calculate_and_assign_stats(socket.assigns.teams, games, round)}
   end
 
   def handle_info({:games_updated, games}, socket) do
     teams = socket.assigns.teams
-    {:noreply, calculate_and_assign_stats(socket, teams, games, socket.assigns.round)}
+    games = games |> Enum.filter(&(&1.year == socket.assigns.year))
+
+    case games do
+      [] ->
+        {:noreply, socket}
+
+      _ ->
+        {:noreply, calculate_and_assign_stats(socket, teams, games, socket.assigns.round)}
+    end
   end
 
   def handle_info({:game_updated, game}, socket) do
-    teams = socket.assigns.teams
-    games = FootyLive.Games.list_games()
+    year = socket.assigns.year
 
-    {:noreply,
-     calculate_and_assign_stats(socket, teams, games, socket.assigns.round, [
-       game.hteamid,
-       game.ateamid
-     ])}
+    case game do
+      %Game{year: ^year} ->
+        teams = socket.assigns.teams
+        games = FootyLive.Games.list_games(year: socket.assigns.year)
+
+        {:noreply,
+         calculate_and_assign_stats(socket, teams, games, socket.assigns.round, [
+           game.hteamid,
+           game.ateamid
+         ])}
+
+      _ ->
+        {:noreply, socket}
+    end
   end
 
   defp calculate_averages(averages) do

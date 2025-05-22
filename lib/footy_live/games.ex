@@ -18,6 +18,16 @@ defmodule FootyLive.Games do
   @doc """
   Returns the list of all games.
   """
+  def list_games(filter) when is_list(filter) do
+    list_games()
+    |> Enum.filter(fn game ->
+      for {k, v} <- filter do
+        match?(%{^k => ^v}, game)
+      end
+      |> Enum.reduce(true, &(&1 && &2))
+    end)
+  end
+
   def list_games do
     case :ets.tab2list(table_name()) do
       [] ->
@@ -52,19 +62,20 @@ defmodule FootyLive.Games do
   @doc """
   Returns the list of games for a specific round.
   """
-  def list_games_by_round(round) when is_integer(round) do
-    list_games()
-    |> Enum.filter(fn game -> game.round == round end)
+  def list_games_by_round(round, year \\ DateTime.utc_now().year)
+
+  def list_games_by_round(round, year) when is_integer(round) do
+    list_games(round: round, year: year)
   end
 
-  def list_games_by_round(round) when is_binary(round) do
+  def list_games_by_round(round, year) when is_binary(round) do
     case Integer.parse(round) do
-      {num, _} -> list_games_by_round(num)
+      {num, _} -> list_games_by_round(num, year)
       :error -> []
     end
   end
 
-  def list_games_by_round(_), do: []
+  def list_games_by_round(_round, _year), do: []
 
   @doc """
   Returns a game by its ID.
@@ -129,9 +140,20 @@ defmodule FootyLive.Games do
   @doc """
   Returns a sorted list of all available rounds.
   """
-  def list_rounds do
+  def list_rounds(year \\ DateTime.utc_now().year) do
     list_games()
+    |> Enum.filter(&(&1.year == year))
     |> Enum.map(& &1.round)
+    |> Enum.uniq()
+    |> Enum.sort()
+  end
+
+  @doc """
+  Returns a sorted list of all available years.
+  """
+  def list_years do
+    list_games()
+    |> Enum.map(& &1.year)
     |> Enum.uniq()
     |> Enum.sort()
   end
@@ -139,8 +161,8 @@ defmodule FootyLive.Games do
   @doc """
   Manually refresh the games cache.
   """
-  def refresh do
-    GenServer.call(__MODULE__, :refresh)
+  def refresh(year \\ DateTime.utc_now().year) do
+    GenServer.call(__MODULE__, {:refresh, year})
   end
 
   # Server
@@ -158,6 +180,12 @@ defmodule FootyLive.Games do
   @impl true
   def handle_call(:refresh, _from, state) do
     games = do_refresh()
+    {:reply, games, state}
+  end
+
+  @impl true
+  def handle_call({:refresh, year}, _from, state) do
+    games = do_refresh(year)
     {:reply, games, state}
   end
 
@@ -185,8 +213,8 @@ defmodule FootyLive.Games do
     end
   end
 
-  defp do_refresh do
-    case Squiggle.games(year: DateTime.utc_now().year) do
+  defp do_refresh(year \\ DateTime.utc_now().year) do
+    case Squiggle.games(year: year) do
       {:ok, %{games: games}} ->
         games =
           games
