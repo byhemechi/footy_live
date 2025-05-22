@@ -5,7 +5,7 @@ defmodule FootyLive.Teams do
 
   use GenServer
 
-  @default_table_name :afl_teams
+  @default_table_name "afl_teams"
   @topic "teams"
 
   def start_link(opts \\ []) do
@@ -17,7 +17,7 @@ defmodule FootyLive.Teams do
   Get a team's name by ID.
   """
   def name(team_id) when is_integer(team_id) do
-    case :ets.lookup(table_name(), team_id) do
+    case :dets.lookup(table_name(), team_id) do
       [{^team_id, team}] -> team.name
       [] -> "Unknown"
     end
@@ -55,7 +55,7 @@ defmodule FootyLive.Teams do
   Returns the list of all teams.
   """
   def list_teams do
-    case :ets.tab2list(table_name()) do
+    case :dets.select(table_name(), [{:"$1", [], [:"$1"]}]) do
       [] ->
         refresh()
 
@@ -78,7 +78,9 @@ defmodule FootyLive.Teams do
   @impl true
   def init(opts) do
     table_name = table_name(opts)
-    table = :ets.new(table_name, [:set, :named_table, :public, read_concurrency: true])
+    path = Path.join(Application.fetch_env!(:footy_live, :dets_path), "#{table_name}.dets")
+    File.mkdir_p!(Path.dirname(path))
+    {:ok, table} = :dets.open_file(table_name, [file: String.to_charlist(path), type: :set])
 
     {:ok, %{table: table, timer: nil, name: opts[:name]}}
   end
@@ -95,11 +97,18 @@ defmodule FootyLive.Teams do
     {:noreply, state}
   end
 
+  @impl true
+  def terminate(_reason, %{table: table}) do
+    :dets.close(table)
+    :ok
+  end
+
   defp table_name(opts \\ []) do
     case opts[:name] do
       nil -> @default_table_name
-      name when is_atom(name) -> :"#{name}_table"
+      name when is_atom(name) -> "#{name}_table"
     end
+    |> String.to_atom()
   end
 
   defp do_refresh do
@@ -108,7 +117,7 @@ defmodule FootyLive.Teams do
         teams
         |> Enum.map(&struct(Squiggle.Team, &1))
         |> Enum.each(fn team ->
-          :ets.insert(table_name(), {team.id, team})
+          :dets.insert(table_name(), {team.id, team})
         end)
 
         sorted_teams = Enum.sort_by(teams, & &1.name)

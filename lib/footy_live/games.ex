@@ -5,7 +5,7 @@ defmodule FootyLive.Games do
 
   use GenServer
 
-  @default_table_name :afl_games
+  @default_table_name "afl_games"
   @topic "games"
   @realtime_topic "live_games"
   @refresh_interval :timer.hours(1)
@@ -29,7 +29,7 @@ defmodule FootyLive.Games do
   end
 
   def list_games do
-    case :ets.tab2list(table_name()) do
+    case :dets.select(table_name(), [{:"$1", [], [:"$1"]}]) do
       [] ->
         refresh()
 
@@ -81,7 +81,7 @@ defmodule FootyLive.Games do
   Returns a game by its ID.
   """
   def get_game(id) when is_integer(id) do
-    case :ets.lookup(table_name(), id) do
+    case :dets.lookup(table_name(), id) do
       [{^id, game}] -> game
       [] -> nil
     end
@@ -100,7 +100,7 @@ defmodule FootyLive.Games do
   Stores a single game in the cache and broadcasts the update.
   """
   def put_game(%Squiggle.Game{} = game) do
-    :ets.insert(table_name(), {game.id, game})
+    :dets.insert(table_name(), {game.id, game})
     sorted_games = list_games()
     Phoenix.PubSub.broadcast(FootyLive.PubSub, @topic, {:games_updated, sorted_games})
     Phoenix.PubSub.broadcast(FootyLive.PubSub, @realtime_topic, {:game_updated, game})
@@ -127,7 +127,7 @@ defmodule FootyLive.Games do
       |> Enum.reject(&is_nil/1)
 
     for game <- games do
-      :ets.insert(table_name(), {game.id, game})
+      :dets.insert(table_name(), {game.id, game})
     end
 
     sorted_games = list_games()
@@ -170,7 +170,9 @@ defmodule FootyLive.Games do
   @impl true
   def init(opts) do
     table_name = table_name(opts)
-    table = :ets.new(table_name, [:set, :named_table, :public, read_concurrency: true])
+    path = Path.join(Application.fetch_env!(:footy_live, :dets_path), "#{table_name}.dets")
+    File.mkdir_p!(Path.dirname(path))
+    {:ok, table} = :dets.open_file(table_name, [file: String.to_charlist(path), type: :set])
     timer = schedule_refresh()
     do_refresh()
 
@@ -197,8 +199,9 @@ defmodule FootyLive.Games do
   end
 
   @impl true
-  def terminate(_reason, %{timer: timer}) do
+  def terminate(_reason, %{table: table, timer: timer}) do
     if timer, do: Process.cancel_timer(timer)
+    :dets.close(table)
     :ok
   end
 
@@ -209,8 +212,9 @@ defmodule FootyLive.Games do
   defp table_name(opts \\ []) do
     case opts[:name] do
       nil -> @default_table_name
-      name when is_atom(name) -> :"#{name}_table"
+      name when is_atom(name) -> "#{name}_table"
     end
+    |> String.to_atom()
   end
 
   defp do_refresh(year \\ DateTime.utc_now().year) do

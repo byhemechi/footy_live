@@ -7,6 +7,13 @@ import Config
 # any compile-time configuration in here, as it won't be applied.
 # The block below contains prod specific runtime configuration.
 
+dets_path =
+  System.get_env("FOOTY_LIVE_DB_PATH") ||
+    Application.app_dir(:footy_live, "priv/db")
+
+config :footy_live,
+  dets_path: dets_path
+
 # ## Using releases
 #
 # If you use `mix release`, you need to explicitly enable the server
