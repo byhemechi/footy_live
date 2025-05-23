@@ -228,7 +228,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
       <.link
         :for={round <- @rounds}
         :if={round}
-        class={["tab transition-all", @round == round && "tab-active"]}
+        class={["tab transition-all", @round == round.id && "tab-active"]}
         patch={~p"/premiership_window?round=#{round}&year=#{@year}"}
       >
         {round}

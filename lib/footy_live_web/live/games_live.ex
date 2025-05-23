@@ -49,7 +49,7 @@ defmodule FootyLiveWeb.GamesLive do
           <.link
             :for={round <- @rounds}
             :if={round}
-            class={["tab", @round == round && "tab-active"]}
+            class={["tab", @round == round.id && "tab-active"]}
             patch={~p"/games?round=#{round}"}
           >
             {round}

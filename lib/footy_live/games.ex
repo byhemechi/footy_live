@@ -2,6 +2,7 @@ defmodule FootyLive.Games do
   @moduledoc """
   Context for managing AFL games and their cached data.
   """
+  alias Squiggle.Game
 
   use GenServer
 
@@ -143,7 +144,17 @@ defmodule FootyLive.Games do
   def list_rounds(year \\ DateTime.utc_now().year) do
     list_games()
     |> Enum.filter(&(&1.year == year))
-    |> Enum.map(& &1.round)
+    |> Enum.map(
+      &%__MODULE__.Round{
+        kind:
+          case &1.is_final do
+            0 -> :home_and_away
+            final when final in 1..5 -> :final
+            6 -> :grand_final
+          end,
+        id: &1.round
+      }
+    )
     |> Enum.uniq()
     |> Enum.sort()
   end
@@ -172,7 +183,7 @@ defmodule FootyLive.Games do
     table_name = table_name(opts)
     path = Path.join(Application.fetch_env!(:footy_live, :dets_path), "#{table_name}.dets")
     File.mkdir_p!(Path.dirname(path))
-    {:ok, table} = :dets.open_file(table_name, [file: String.to_charlist(path), type: :set])
+    {:ok, table} = :dets.open_file(table_name, file: String.to_charlist(path), type: :set)
     timer = schedule_refresh()
     do_refresh()
 
