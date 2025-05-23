@@ -12,7 +12,7 @@ defmodule FootyLive.Application do
       {DNSCluster, query: Application.get_env(:footy_live, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: FootyLive.PubSub},
       # Start the Teams cache
-      FootyLive.Teams,
+      {Task, &FootyLive.Teams.refresh/0},
       # Start the Games cache
       FootyLive.Games,
       # Start the Realtime service
