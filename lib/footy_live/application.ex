@@ -11,8 +11,6 @@ defmodule FootyLive.Application do
       FootyLiveWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:footy_live, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: FootyLive.PubSub},
-      # Start the Teams cache
-      {Task, &FootyLive.Teams.refresh/0},
       # Start the Games cache
       FootyLive.Games,
       # Start the Realtime service
@@ -24,6 +22,8 @@ defmodule FootyLive.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: FootyLive.Supervisor]
+
+    # FootyLive.Database.initialise_disk_copies()
     Supervisor.start_link(children, opts)
   end
 

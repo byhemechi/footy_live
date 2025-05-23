@@ -2,11 +2,10 @@ defmodule FootyLive.Games do
   @moduledoc """
   Context for managing AFL games and their cached data.
   """
-  alias Squiggle.Game
+  require Logger
 
   use GenServer
 
-  @default_table_name "afl_games"
   @topic "games"
   @realtime_topic "live_games"
   @refresh_interval :timer.hours(1)
@@ -19,25 +18,21 @@ defmodule FootyLive.Games do
   @doc """
   Returns the list of all games.
   """
-  def list_games(filter) when is_list(filter) do
-    list_games()
-    |> Enum.filter(fn game ->
-      for {k, v} <- filter do
-        match?(%{^k => ^v}, game)
-      end
-      |> Enum.reduce(true, &(&1 && &2))
+  @spec list_games(filter :: list(tuple) | tuple) :: [Squiggle.Game.t()]
+  def list_games(filter) do
+    Memento.transaction!(fn ->
+      Memento.Query.select(Squiggle.Game, filter)
     end)
   end
 
   def list_games do
-    case :dets.select(table_name(), [{:"$1", [], [:"$1"]}]) do
+    Memento.transaction!(fn -> Memento.Query.all(Squiggle.Game) end)
+    |> case do
       [] ->
         refresh()
 
       games ->
         games
-        |> Enum.map(&elem(&1, 1))
-        |> Enum.sort_by(& &1.date)
     end
   end
 
@@ -45,9 +40,11 @@ defmodule FootyLive.Games do
   Returns the list of games for a specific team.
   """
   def list_games_by_team(team_id) when is_integer(team_id) do
-    list_games()
-    |> Enum.filter(fn game ->
-      game.hteamid == team_id || game.ateamid == team_id
+    Memento.transaction!(fn ->
+      Memento.Query.select(
+        Squiggle.Game,
+        {:or, {:==, :hteamid, team_id}, {:==, :ateamid, team_id}}
+      )
     end)
   end
 
@@ -82,10 +79,9 @@ defmodule FootyLive.Games do
   Returns a game by its ID.
   """
   def get_game(id) when is_integer(id) do
-    case :dets.lookup(table_name(), id) do
-      [{^id, game}] -> game
-      [] -> nil
-    end
+    Memento.transaction!(fn ->
+      Memento.Query.read(Squiggle.Game, id)
+    end)
   end
 
   def get_game(id) when is_binary(id) do
@@ -101,10 +97,17 @@ defmodule FootyLive.Games do
   Stores a single game in the cache and broadcasts the update.
   """
   def put_game(%Squiggle.Game{} = game) do
-    :dets.insert(table_name(), {game.id, game})
-    sorted_games = list_games()
-    Phoenix.PubSub.broadcast(FootyLive.PubSub, @topic, {:games_updated, sorted_games})
+    Memento.transaction!(fn ->
+      Memento.Query.write(game)
+    end)
+
     Phoenix.PubSub.broadcast(FootyLive.PubSub, @realtime_topic, {:game_updated, game})
+
+    Task.start(fn ->
+      sorted_games = list_games()
+      Phoenix.PubSub.broadcast(FootyLive.PubSub, @topic, {:games_updated, sorted_games})
+    end)
+
     game
   end
 
@@ -127,9 +130,11 @@ defmodule FootyLive.Games do
       end)
       |> Enum.reject(&is_nil/1)
 
-    for game <- games do
-      :dets.insert(table_name(), {game.id, game})
-    end
+    Memento.transaction!(fn ->
+      for game <- games do
+        Memento.Query.write(game)
+      end
+    end)
 
     sorted_games = list_games()
     Phoenix.PubSub.broadcast(FootyLive.PubSub, @topic, {:games_updated, sorted_games})
@@ -169,66 +174,29 @@ defmodule FootyLive.Games do
     |> Enum.sort()
   end
 
-  @doc """
-  Manually refresh the games cache.
-  """
-  def refresh(year \\ DateTime.utc_now().year) do
-    GenServer.call(__MODULE__, {:refresh, year})
-  end
-
-  # Server
-
   @impl true
   def init(opts) do
-    table_name = table_name(opts)
-    path = Path.join(Application.fetch_env!(:footy_live, :dets_path), "#{table_name}.dets")
-    File.mkdir_p!(Path.dirname(path))
-    {:ok, table} = :dets.open_file(table_name, file: String.to_charlist(path), type: :set)
+    Memento.Table.wait([Squiggle.Game], :infinity)
     timer = schedule_refresh()
-    do_refresh()
 
-    {:ok, %{table: table, timer: timer, name: opts[:name]}}
-  end
-
-  @impl true
-  def handle_call(:refresh, _from, state) do
-    games = do_refresh()
-    {:reply, games, state}
-  end
-
-  @impl true
-  def handle_call({:refresh, year}, _from, state) do
-    games = do_refresh(year)
-    {:reply, games, state}
+    {:ok, %{timer: timer, name: opts[:name]}}
   end
 
   @impl true
   def handle_info(:refresh, state) do
-    do_refresh()
+    refresh()
     timer = schedule_refresh()
     {:noreply, %{state | timer: timer}}
-  end
-
-  @impl true
-  def terminate(_reason, %{table: table, timer: timer}) do
-    if timer, do: Process.cancel_timer(timer)
-    :dets.close(table)
-    :ok
   end
 
   defp schedule_refresh do
     Process.send_after(self(), :refresh, @refresh_interval)
   end
 
-  defp table_name(opts \\ []) do
-    case opts[:name] do
-      nil -> @default_table_name
-      name when is_atom(name) -> "#{name}_table"
-    end
-    |> String.to_atom()
-  end
-
-  defp do_refresh(year \\ DateTime.utc_now().year) do
+  @doc """
+  Manually refresh the games cache.
+  """
+  def refresh(year \\ DateTime.utc_now().year) do
     case Squiggle.games(year: year) do
       {:ok, %{games: games}} ->
         games =

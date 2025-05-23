@@ -338,7 +338,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
           rounds |> Enum.at(-1)
       end
 
-    games = FootyLive.Games.list_games(year: year)
+    games = FootyLive.Games.list_games({:==, :year, year})
 
     {:noreply,
      socket
@@ -365,7 +365,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
     case game do
       %Game{year: ^year} ->
         teams = socket.assigns.teams
-        games = FootyLive.Games.list_games(year: socket.assigns.year)
+        games = FootyLive.Games.list_games({:==, :year, socket.assigns.year})
 
         {:noreply,
          calculate_and_assign_stats(socket, teams, games, socket.assigns.round, [

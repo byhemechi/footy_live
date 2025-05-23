@@ -39,6 +39,7 @@ defmodule FootyLive.Teams do
   end
 
   def refresh do
+    Memento.Table.wait([Squiggle.Team], :infinity)
     Logger.info("Refreshing teams...")
 
     case Squiggle.teams() do

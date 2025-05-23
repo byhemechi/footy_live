@@ -1,3 +1,4 @@
+FootyLive.Database.initialise_disk_copies()
 ExUnit.start()
 
 # Setup Req Mock
