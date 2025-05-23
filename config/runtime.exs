@@ -11,6 +11,15 @@ dets_path =
   System.get_env("FOOTY_LIVE_DB_PATH") ||
     Application.app_dir(:footy_live, "priv/db")
 
+case System.get_env("FOOTY_LIVE_DB_PATH") do
+  nil ->
+    nil
+
+  path ->
+    config :mnesia,
+      dir: String.to_charlist(path)
+end
+
 umami_host =
   System.get_env("UMAMI_HOST")
 

@@ -3,25 +3,27 @@ defmodule Squiggle.Game do
   A struct representing an AFL game from the Squiggle API.
   """
 
-  defstruct [
-    :id,
-    :year,
-    :round,
-    :date,
-    :venue,
-    :ateam,
-    :hteam,
-    :ateamid,
-    :hteamid,
-    :agoals,
-    :hgoals,
-    :abehinds,
-    :hbehinds,
-    :ascore,
-    :hscore,
-    :complete,
-    :timestr,
-    :is_grand_final,
-    :is_final
-  ]
+  use Memento.Table,
+    attributes: [
+      :id,
+      :year,
+      :round,
+      :date,
+      :venue,
+      :ateam,
+      :hteam,
+      :ateamid,
+      :hteamid,
+      :agoals,
+      :hgoals,
+      :abehinds,
+      :hbehinds,
+      :ascore,
+      :hscore,
+      :complete,
+      :timestr,
+      :is_grand_final,
+      :is_final
+    ],
+    index: [:year, :round]
 end
