@@ -2,7 +2,6 @@ defmodule FootyLive.Games do
   @moduledoc """
   Context for managing AFL games and their cached data.
   """
-  alias Squiggle.Game
 
   use GenServer
 

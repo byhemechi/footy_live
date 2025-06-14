@@ -28,6 +28,18 @@ defmodule FootyLive.Realtime do
     {:ok, nil}
   end
 
+  def handle_info({:squiggle_event, %{event: "timestr", data: event}}, state) do
+    event = Jason.decode!(event)
+
+    if game = FootyLive.Games.get_game(event["gameid"]) do
+      game
+      |> Map.put(:timestr, event["timestr"])
+      |> FootyLive.Games.put_game()
+    end
+
+    {:noreply, state}
+  end
+
   def handle_info({:squiggle_event, %{event: "score", data: event}}, state) do
     event = Jason.decode!(event)
 
@@ -58,11 +70,6 @@ defmodule FootyLive.Realtime do
     struct(Squiggle.Game, event)
     |> FootyLive.Games.put_game()
 
-    {:noreply, state}
-  end
-
-  def handle_info({:squiggle_event, %{event: "message", data: message_data}}, state) do
-    IO.inspect(Jason.decode!(message_data), label: "Message from Squiggle")
     {:noreply, state}
   end
 
