@@ -7,7 +7,7 @@ defmodule FootyLiveWeb.GamesLive do
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket) do
-      Phoenix.PubSub.subscribe(FootyLive.PubSub, "games")
+      Phoenix.PubSub.subscribe(FootyLive.PubSub, "live_games")
     end
 
     socket =
@@ -106,8 +106,14 @@ defmodule FootyLiveWeb.GamesLive do
   end
 
   @impl true
-  def handle_info({:games_updated, games}, socket) do
-    {:noreply, assign(socket, :games, sort_games(games))}
+  def handle_info({:game_updated, %{round: round} = game}, socket) do
+    case socket.assigns do
+      %{round: ^round} ->
+        {:noreply, stream(socket, :games, [game])}
+
+      _ ->
+        {:noreply, socket}
+    end
   end
 
   @impl true

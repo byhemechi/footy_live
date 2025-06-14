@@ -346,19 +346,6 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
      |> calculate_and_assign_stats(socket.assigns.teams, games, round)}
   end
 
-  def handle_info({:games_updated, games}, socket) do
-    teams = socket.assigns.teams
-    games = games |> Enum.filter(&(&1.year == socket.assigns.year))
-
-    case games do
-      [] ->
-        {:noreply, socket}
-
-      _ ->
-        {:noreply, calculate_and_assign_stats(socket, teams, games, socket.assigns.round)}
-    end
-  end
-
   def handle_info({:game_updated, game}, socket) do
     year = socket.assigns.year
 
