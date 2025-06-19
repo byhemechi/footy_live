@@ -12,8 +12,10 @@ defmodule FootyLiveWeb.Endpoint do
   ]
 
   socket "/live", Phoenix.LiveView.Socket,
-    websocket: [connect_info: [session: @session_options]],
-    longpoll: [connect_info: [session: @session_options]]
+    websocket: [
+      connect_info: [session: @session_options],
+      serializer: [{Phoenix.Socket.V2.BERTSerializer, "~> 2.0.0"}]
+    ]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
