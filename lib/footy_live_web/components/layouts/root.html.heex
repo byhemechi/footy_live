@@ -36,13 +36,6 @@
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
     <link rel="preconnect" href="https://squiggle.com.au" />
-    <link
-      :for={team <- FootyLive.Teams.list_teams()}
-      rel="preload"
-      href={URI.parse("https://squiggle.com.au/") |> URI.append_path(team.logo)}
-      type={"image/#{team.logo |> String.split(".") |> Enum.at(-1)}"}
-      as="image"
-    />
     <script>
       (() => {
         const setTheme = (theme) => {
