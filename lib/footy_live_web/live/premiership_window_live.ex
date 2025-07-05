@@ -325,7 +325,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
           DateTime.utc_now().year
       end
 
-    rounds = FootyLive.Games.list_rounds(year)
+    rounds = FootyLive.Games.list_rounds(year: year, hide_future: true)
 
     round =
       case params do

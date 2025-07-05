@@ -24,7 +24,24 @@ defmodule FootyLiveWeb.GamesLive do
 
   @impl true
   def handle_params(params, _uri, socket) do
-    {round_id, _} = params |> Map.get("round", "0") |> Integer.parse()
+    round_id =
+      params
+      |> Map.get("round", Games.current_round())
+      |> IO.inspect(label: "Round")
+      |> case do
+        round_id when is_integer(round_id) ->
+          round_id
+
+        %Games.Round{id: round_id} ->
+          round_id
+
+        round_id when is_binary(round_id) ->
+          {round_id, _} = Integer.parse(round_id)
+          round_id
+
+        _ ->
+          0
+      end
 
     {:noreply,
      socket

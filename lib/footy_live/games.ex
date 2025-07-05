@@ -140,22 +140,29 @@ defmodule FootyLive.Games do
   @doc """
   Returns a sorted list of all available rounds.
   """
-  def list_rounds(year \\ DateTime.utc_now().year) do
+  def list_rounds(opts \\ [])
+
+  def list_rounds(year) when is_integer(year), do: list_rounds(year: year)
+
+  def list_rounds(opts) when is_list(opts) do
+    year = Keyword.get(opts, :year, DateTime.utc_now().year)
+    hide_future = Keyword.get(opts, :hide_future, false)
+
     list_games()
     |> Enum.filter(&(&1.year == year))
-    |> Enum.map(
-      &%__MODULE__.Round{
-        kind:
-          case &1.is_final do
-            0 -> :home_and_away
-            final when final in 1..5 -> :final
-            6 -> :grand_final
-          end,
-        id: &1.round
-      }
-    )
+    |> Enum.filter(fn
+      %Squiggle.Game{complete: 0} when hide_future -> false
+      %Squiggle.Game{complete: _} -> true
+    end)
+    |> Enum.map(&__MODULE__.Round.from_game/1)
     |> Enum.uniq()
     |> Enum.sort()
+  end
+
+  def current_round do
+    list_games()
+    |> Enum.find(&(&1.complete !== 100))
+    |> __MODULE__.Round.from_game()
   end
 
   @doc """
