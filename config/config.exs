@@ -22,6 +22,12 @@ config :footy_live, FootyLiveWeb.Endpoint,
   pubsub_server: FootyLive.PubSub,
   live_view: [signing_salt: "FiThRHrB"]
 
+config :sentry,
+  traces_sample_rate: 1.0
+
+config :opentelemetry, span_processor: {Sentry.OpenTelemetry.SpanProcessor, []}
+config :opentelemetry, sampler: {Sentry.OpenTelemetry.Sampler, []}
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",

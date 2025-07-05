@@ -63,6 +63,12 @@ defmodule FootyLive.MixProject do
       {:server_sent_events, "~> 0.2"},
       {:phoenix_socket_bert, "~> 1.0"},
       {:sentry, "~> 11.0"},
+      {:opentelemetry, "~> 1.5"},
+      {:opentelemetry_api, "~> 1.4"},
+      {:opentelemetry_exporter, "~> 1.0"},
+      {:opentelemetry_semantic_conventions, "~> 1.27"},
+      {:opentelemetry_phoenix, "~> 2.0"},
+      {:opentelemetry_bandit, "~> 0.1"},
       {:hackney, "~> 1.24"}
     ]
   end

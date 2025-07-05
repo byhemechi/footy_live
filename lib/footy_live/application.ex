@@ -11,6 +11,9 @@ defmodule FootyLive.Application do
       config: %{metadata: [:file, :line]}
     })
 
+    OpentelemetryBandit.setup()
+    OpentelemetryPhoenix.setup(adapter: :bandit)
+
     children = [
       FootyLiveWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:footy_live, :dns_cluster_query) || :ignore},
