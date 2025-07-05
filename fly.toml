@@ -10,7 +10,7 @@ kill_signal = 'SIGTERM'
 [build]
 
 [env]
-PHX_HOST = 'footy-live.fly.dev'
+PHX_HOST = 'foomtbal.sadcloud.co'
 PORT = '8080'
 FOOTY_LIVE_DB_PATH = '/data'
 
@@ -28,7 +28,7 @@ hard_limit = 1000
 soft_limit = 1000
 
 [[vm]]
-memory = '512mb'
+memory = '256mb'
 cpu_kind = 'shared'
 cpus = 1
 
