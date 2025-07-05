@@ -25,8 +25,6 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends build-essential git \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=oven/bun:1.2-distroless /usr/local/bin/bun /bin/bun
-
 # prepare build dir
 WORKDIR /app
 
