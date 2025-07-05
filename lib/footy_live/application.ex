@@ -14,6 +14,8 @@ defmodule FootyLive.Application do
     OpentelemetryBandit.setup()
     OpentelemetryPhoenix.setup(adapter: :bandit)
 
+    File.mkdir_p!(Application.fetch_env!(:footy_live, :ets_path))
+
     children = [
       FootyLiveWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:footy_live, :dns_cluster_query) || :ignore},

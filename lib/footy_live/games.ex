@@ -5,7 +5,6 @@ defmodule FootyLive.Games do
 
   use GenServer
 
-  @default_table_name "afl_games"
   @topic "games"
   @realtime_topic "live_games"
   @refresh_interval :timer.hours(1)
@@ -29,7 +28,7 @@ defmodule FootyLive.Games do
   end
 
   def list_games do
-    case :dets.select(table_name(), [{:"$1", [], [:"$1"]}]) do
+    case :ets.select(__MODULE__, [{:"$1", [], [:"$1"]}]) do
       [] ->
         refresh()
 
@@ -81,7 +80,7 @@ defmodule FootyLive.Games do
   Returns a game by its ID.
   """
   def get_game(id) when is_integer(id) do
-    case :dets.lookup(table_name(), id) do
+    case :ets.lookup(__MODULE__, id) do
       [{^id, game}] -> game
       [] -> nil
     end
@@ -100,7 +99,7 @@ defmodule FootyLive.Games do
   Stores a single game in the cache and broadcasts the update.
   """
   def put_game(%Squiggle.Game{} = game) do
-    :dets.insert(table_name(), {game.id, game})
+    :ets.insert(__MODULE__, {game.id, game})
     sorted_games = list_games()
     Phoenix.PubSub.broadcast(FootyLive.PubSub, @topic, {:games_updated, sorted_games})
     Phoenix.PubSub.broadcast(FootyLive.PubSub, @realtime_topic, {:game_updated, game})
@@ -127,8 +126,10 @@ defmodule FootyLive.Games do
       |> Enum.reject(&is_nil/1)
 
     for game <- games do
-      :dets.insert(table_name(), {game.id, game})
+      :ets.insert(__MODULE__, {game.id, game})
     end
+
+    save_changes()
 
     sorted_games = list_games()
     Phoenix.PubSub.broadcast(FootyLive.PubSub, @topic, {:games_updated, sorted_games})
@@ -182,14 +183,28 @@ defmodule FootyLive.Games do
     GenServer.call(__MODULE__, {:refresh, year})
   end
 
-  # Server
+  defp get_path do
+    Path.join(Application.fetch_env!(:footy_live, :ets_path), "#{__MODULE__}.ets")
+  end
+
+  defp save_changes do
+    :ets.tab2file(__MODULE__, String.to_charlist(get_path()))
+  end
 
   @impl true
   def init(opts) do
-    table_name = table_name(opts)
-    path = Path.join(Application.fetch_env!(:footy_live, :dets_path), "#{table_name}.dets")
-    File.mkdir_p!(Path.dirname(path))
-    {:ok, table} = :dets.open_file(table_name, file: String.to_charlist(path), type: :set)
+    table =
+      case :ets.file2tab(String.to_charlist(get_path())) do
+        {:ok, table} ->
+          table
+
+        {:error, {:read_error, {:file_error, _path, :enoent}}} ->
+          :ets.new(__MODULE__, [:set, :protected, :named_table])
+
+        {:error, err} ->
+          raise err
+      end
+
     timer = schedule_refresh()
     do_refresh()
 
@@ -218,8 +233,8 @@ defmodule FootyLive.Games do
   @impl true
   def terminate(_reason, %{table: table, timer: timer}) do
     if timer, do: Process.cancel_timer(timer)
-    :dets.close(table)
-    :ok
+
+    save_changes()
   end
 
   defp schedule_refresh do
