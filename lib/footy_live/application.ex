@@ -7,6 +7,10 @@ defmodule FootyLive.Application do
 
   @impl true
   def start(_type, _args) do
+    :logger.add_handler(:foomtbal_sentry, Sentry.LoggerHandler, %{
+      config: %{metadata: [:file, :line]}
+    })
+
     children = [
       FootyLiveWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:footy_live, :dns_cluster_query) || :ignore},

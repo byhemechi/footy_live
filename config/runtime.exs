@@ -35,6 +35,18 @@ if System.get_env("PHX_SERVER") do
   config :footy_live, FootyLiveWeb.Endpoint, server: true
 end
 
+case System.get_env("SENTRY_DSN") do
+  dsn when is_binary(dsn) ->
+    config :sentry,
+      dsn: dsn,
+      environment_name: Mix.env(),
+      enable_source_code_context: true,
+      root_source_code_paths: [File.cwd!()]
+
+  _ ->
+    :ok
+end
+
 if config_env() == :prod do
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you

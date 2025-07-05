@@ -315,6 +315,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
   end
 
   def handle_params(params, _uri, socket) do
+    current_year = DateTime.utc_now().year
+
     year =
       case params do
         %{"year" => year} ->
@@ -322,10 +324,12 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
           year
 
         _ ->
-          DateTime.utc_now().year
+          current_year
       end
 
     rounds = FootyLive.Games.list_rounds(year: year, hide_future: true)
+
+    current_round = FootyLive.Games.current_round().id
 
     round =
       case params do
@@ -334,8 +338,11 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
 
           round
 
+        _ when year == current_year ->
+          current_round
+
         _ ->
-          FootyLive.Games.current_round().id
+          rounds |> Enum.at(-1) |> Map.get(:id)
       end
 
     games = FootyLive.Games.list_games(year: year)

@@ -61,7 +61,9 @@ defmodule FootyLive.MixProject do
       {:req, "~> 0.5"},
       {:mox, "~> 1.0", only: :test},
       {:server_sent_events, "~> 0.2"},
-      {:phoenix_socket_bert, "~> 1.0"}
+      {:phoenix_socket_bert, "~> 1.0"},
+      {:sentry, "~> 11.0"},
+      {:hackney, "~> 1.24"}
     ]
   end
 
