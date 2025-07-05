@@ -231,7 +231,7 @@ defmodule FootyLive.Games do
   end
 
   @impl true
-  def terminate(_reason, %{table: table, timer: timer}) do
+  def terminate(_reason, %{timer: timer}) do
     if timer, do: Process.cancel_timer(timer)
 
     save_changes()
@@ -239,14 +239,6 @@ defmodule FootyLive.Games do
 
   defp schedule_refresh do
     Process.send_after(self(), :refresh, @refresh_interval)
-  end
-
-  defp table_name(opts \\ []) do
-    case opts[:name] do
-      nil -> @default_table_name
-      name when is_atom(name) -> "#{name}_table"
-    end
-    |> String.to_atom()
   end
 
   defp do_refresh(year \\ DateTime.utc_now().year) do

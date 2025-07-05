@@ -106,7 +106,7 @@ defmodule FootyLive.Teams do
   end
 
   @impl true
-  def terminate(_reason, %{table: table}) do
+  def terminate(_reason, _state) do
     save_changes()
   end
 
