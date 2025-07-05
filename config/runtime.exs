@@ -39,7 +39,7 @@ case System.get_env("SENTRY_DSN") do
   dsn when is_binary(dsn) ->
     config :sentry,
       dsn: dsn,
-      environment_name: Mix.env(),
+      environment_name: Application.get_env(:footy_live, :mix_env),
       enable_source_code_context: true,
       root_source_code_paths: [File.cwd!()]
 

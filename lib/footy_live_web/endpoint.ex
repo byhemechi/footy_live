@@ -53,9 +53,10 @@ defmodule FootyLiveWeb.Endpoint do
     pass: ["*/*"],
     json_decoder: Phoenix.json_library()
 
+  plug Sentry.PlugContext
+
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
   plug FootyLiveWeb.Router
-  plug Sentry.PlugContext
 end

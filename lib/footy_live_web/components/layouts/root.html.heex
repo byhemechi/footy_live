@@ -11,6 +11,18 @@
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <link rel="shortcut icon" href={~p"/images/foomtbal.svg"} />
+
+    <%= case Application.fetch_env(:sentry, :dsn) do %>
+      <% {:ok, dsn} -> %>
+        <meta name="sentry-dsn" content={dsn} />
+        <script
+          type="module"
+          src={"https://js.sentry-cdn.com/#{Application.fetch_env!(:sentry, :dsn) |> URI.parse |> Map.get(:userinfo)}.min.js"}
+          crossorigin="anonymous"
+          defer
+        />
+      <% _ -> %>
+    <% end %>
     <%= if Application.fetch_env!(:footy_live, :umami_site_id) &&
       Application.fetch_env!(:footy_live, :umami_host) do %>
       <link rel="preconnect" href={Application.fetch_env!(:footy_live, :umami_host)} />
@@ -29,6 +41,7 @@
       rel="preload"
       href={URI.parse("https://squiggle.com.au/") |> URI.append_path(team.logo)}
       type={"image/#{team.logo |> String.split(".") |> Enum.at(-1)}"}
+      as="image"
     />
     <script>
       (() => {
