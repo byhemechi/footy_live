@@ -335,7 +335,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
           round
 
         _ ->
-          rounds |> Enum.at(-1)
+          FootyLive.Games.current_round().id
       end
 
     games = FootyLive.Games.list_games(year: year)

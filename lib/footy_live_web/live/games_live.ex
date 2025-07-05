@@ -72,7 +72,6 @@ defmodule FootyLiveWeb.GamesLive do
             {round}
           </.link>
         </div>
-        <details><pre>{inspect(@teams, pretty: true)}</pre></details>
         <div class="mt-8 flow-root">
           <.table id="games" rows={@streams.games}>
             <:col :let={{_id, game}} label="Date">{game.date |> format_date}</:col>
@@ -151,10 +150,6 @@ defmodule FootyLiveWeb.GamesLive do
         date
     end
   end
-
-  # defp format_round(%{is_final: true, is_grand_final: true}), do: "Grand Final"
-  # defp format_round(%{is_final: true, round: round}), do: "Final #{round}"
-  # defp format_round(%{round: round}), do: "Round #{round}"
 
   defp format_score(goals, behinds) do
     "#{goals}.#{behinds} (#{goals * 6 + behinds})"
