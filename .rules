@@ -4,3 +4,5 @@ Once you are done with changes, run `mix compile` and fix any issues.
 Write tests for your changes and run `mix test` afterwards.
 
 do not use the `project_eval` tool to run `mix compile`
+
+immediately apply changes
