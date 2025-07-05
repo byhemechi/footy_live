@@ -9,6 +9,8 @@ defmodule FootyLive.Games do
   @realtime_topic "live_games"
   @refresh_interval :timer.hours(1)
 
+  require OpenTelemetry.Tracer, as: Tracer
+
   def start_link(opts \\ []) do
     name = Keyword.get(opts, :name, __MODULE__)
     GenServer.start_link(__MODULE__, opts, name: name)
@@ -146,18 +148,20 @@ defmodule FootyLive.Games do
   def list_rounds(year) when is_integer(year), do: list_rounds(year: year)
 
   def list_rounds(opts) when is_list(opts) do
-    year = Keyword.get(opts, :year, DateTime.utc_now().year)
-    hide_future = Keyword.get(opts, :hide_future, false)
+    Tracer.with_span "list_rounds" do
+      year = Keyword.get(opts, :year, DateTime.utc_now().year)
+      hide_future = Keyword.get(opts, :hide_future, false)
 
-    list_games()
-    |> Enum.filter(&(&1.year == year))
-    |> Enum.filter(fn
-      %Squiggle.Game{complete: 0} when hide_future -> false
-      %Squiggle.Game{complete: _} -> true
-    end)
-    |> Enum.map(&__MODULE__.Round.from_game/1)
-    |> Enum.uniq()
-    |> Enum.sort()
+      list_games()
+      |> Enum.filter(&(&1.year == year))
+      |> Enum.filter(fn
+        %Squiggle.Game{complete: 0} when hide_future -> false
+        %Squiggle.Game{complete: _} -> true
+      end)
+      |> Enum.map(&__MODULE__.Round.from_game/1)
+      |> Enum.uniq()
+      |> Enum.sort()
+    end
   end
 
   def current_round do
@@ -242,16 +246,18 @@ defmodule FootyLive.Games do
   end
 
   defp do_refresh(year \\ DateTime.utc_now().year) do
-    case Squiggle.games(year: year) do
-      {:ok, %{games: games}} ->
-        games =
-          games
-          |> Enum.map(&struct(Squiggle.Game, &1))
+    Tracer.with_span "refresh_games" do
+      case Squiggle.games(year: year) do
+        {:ok, %{games: games}} ->
+          games =
+            games
+            |> Enum.map(&struct(Squiggle.Game, &1))
 
-        put_games(games)
+          put_games(games)
 
-      {:error, _} ->
-        []
+        {:error, _} ->
+          []
+      end
     end
   end
 end

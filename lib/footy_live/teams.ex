@@ -126,6 +126,8 @@ defmodule FootyLive.Teams do
         sorted_teams = Enum.sort_by(teams, & &1.name)
         Phoenix.PubSub.broadcast(FootyLive.PubSub, @topic, {:teams_updated, sorted_teams})
 
+        save_changes()
+
         sorted_teams
 
       {:error, _} ->

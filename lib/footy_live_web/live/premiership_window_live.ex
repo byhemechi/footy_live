@@ -3,6 +3,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
   use FootyLiveWeb, :live_view
   @topic "live_games"
 
+  require OpenTelemetry.Tracer, as: Tracer
+
   def render(assigns) do
     ~H"""
     <Layouts.app {assigns}>
@@ -373,84 +375,89 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
   end
 
   defp calculate_averages(averages) do
-    {total_for, total_against, count} =
-      averages
-      |> Map.values()
-      |> Enum.reduce({0, 0, 0}, fn {for_score, against_score},
-                                   {total_for, total_against, count} ->
-        {total_for + for_score, total_against + against_score, count + 1}
-      end)
+    Tracer.with_span "calculate_averages" do
+      {total_for, total_against, count} =
+        averages
+        |> Map.values()
+        |> Enum.reduce({0, 0, 0}, fn {for_score, against_score},
+                                     {total_for, total_against, count} ->
+          {total_for + for_score, total_against + against_score, count + 1}
+        end)
 
-    avg_points_for = if count > 0, do: total_for / count, else: 0
-    avg_points_against = if count > 0, do: total_against / count, else: 0
+      avg_points_for = if count > 0, do: total_for / count, else: 0
+      avg_points_against = if count > 0, do: total_against / count, else: 0
 
-    {avg_points_for, avg_points_against}
+      {avg_points_for, avg_points_against}
+    end
   end
 
   defp calculate_and_assign_stats(socket, teams, games, max_round, team_ids \\ nil) do
-    games =
-      case max_round do
-        _ when is_integer(max_round) ->
-          games |> Enum.filter(&(&1.round <= max_round))
+    Tracer.with_span "calculate_and_assign_stats" do
+      games =
+        case max_round do
+          _ when is_integer(max_round) ->
+            games |> Enum.filter(&(&1.round <= max_round))
 
-        _ ->
-          games
-      end
+          _ ->
+            games
+        end
 
-    averages =
-      for %Team{id: id} <- teams do
-        {id, {games |> average_score_for(id), games |> average_score_against(id)}}
-      end
-      |> Enum.filter(fn {_, {for, against}} -> for > 0 || against > 0 end)
-      |> Enum.into(%{})
+      averages =
+        for %Team{id: id} <- teams do
+          {id, {games |> average_score_for(id), games |> average_score_against(id)}}
+        end
+        |> Enum.filter(fn {_, {for, against}} -> for > 0 || against > 0 end)
+        |> Enum.into(%{})
 
-    max_for =
-      averages |> Enum.reduce(0, fn {_id, {for, _against}}, current -> max(for, current) end)
+      max_for =
+        averages |> Enum.reduce(0, fn {_id, {for, _against}}, current -> max(for, current) end)
 
-    max_against =
-      averages |> Enum.reduce(0, fn {_id, {_for, against}}, current -> max(against, current) end)
+      max_against =
+        averages
+        |> Enum.reduce(0, fn {_id, {_for, against}}, current -> max(against, current) end)
 
-    min_for =
-      averages
-      |> Enum.reduce(250, fn {_id, {for, _against}}, current -> min(for, current) end)
+      min_for =
+        averages
+        |> Enum.reduce(250, fn {_id, {for, _against}}, current -> min(for, current) end)
 
-    min_against =
-      averages
-      |> Enum.reduce(250, fn {_id, {_for, against}}, current -> min(against, current) end)
+      min_against =
+        averages
+        |> Enum.reduce(250, fn {_id, {_for, against}}, current -> min(against, current) end)
 
-    teams =
-      case team_ids do
-        [_ | _] -> teams |> Enum.filter(&Enum.member?(team_ids, &1.id))
-        _ -> teams
-      end
+      teams =
+        case team_ids do
+          [_ | _] -> teams |> Enum.filter(&Enum.member?(team_ids, &1.id))
+          _ -> teams
+        end
 
-    {avg_points_for, avg_points_against} = calculate_averages(averages)
+      {avg_points_for, avg_points_against} = calculate_averages(averages)
 
-    socket =
-      socket
-      |> assign(
-        start_for: floor(min_for / 5) * 5 - 5,
-        end_for: ceil(max_for / 5) * 5 + 5,
-        start_against: floor(min_against / 5) * 5 - 5,
-        end_against: ceil(max_against / 5) * 5 + 5,
-        avg_points_for: avg_points_for,
-        avg_points_against: avg_points_against
+      socket =
+        socket
+        |> assign(
+          start_for: floor(min_for / 5) * 5 - 5,
+          end_for: ceil(max_for / 5) * 5 + 5,
+          start_against: floor(min_against / 5) * 5 - 5,
+          end_against: ceil(max_against / 5) * 5 + 5,
+          avg_points_for: avg_points_for,
+          avg_points_against: avg_points_against
+        )
+        |> stream(
+          :teams,
+          for team <- teams do
+            {team, averages[team.id]}
+          end,
+          dom_id: fn {team, _averages} -> "team-#{team.id}" end
+        )
+
+      teams
+      |> Enum.filter(&is_nil(averages[&1.id]))
+      |> Enum.reduce(
+        socket,
+        fn team, acc ->
+          acc |> stream_delete_by_dom_id(:teams, "team-#{team.id}")
+        end
       )
-      |> stream(
-        :teams,
-        for team <- teams do
-          {team, averages[team.id]}
-        end,
-        dom_id: fn {team, _averages} -> "team-#{team.id}" end
-      )
-
-    teams
-    |> Enum.filter(&is_nil(averages[&1.id]))
-    |> Enum.reduce(
-      socket,
-      fn team, acc ->
-        acc |> stream_delete_by_dom_id(:teams, "team-#{team.id}")
-      end
-    )
+    end
   end
 end
