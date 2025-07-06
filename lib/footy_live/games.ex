@@ -100,7 +100,12 @@ defmodule FootyLive.Games do
   @doc """
   Stores a single game in the cache and broadcasts the update.
   """
-  def put_game(%Squiggle.Game{} = game) do
+
+  def put_game(game) do
+    GenServer.call(__MODULE__, {:put_game, game})
+  end
+
+  defp do_put_game(%Squiggle.Game{} = game) do
     :ets.insert(__MODULE__, {game.id, game})
     sorted_games = list_games()
     Phoenix.PubSub.broadcast(FootyLive.PubSub, @topic, {:games_updated, sorted_games})
@@ -108,16 +113,20 @@ defmodule FootyLive.Games do
     game
   end
 
-  def put_game(game) when is_map(game) do
-    put_game(struct(Squiggle.Game, game))
+  defp do_put_game(game) when is_map(game) do
+    do_put_game(struct(Squiggle.Game, game))
   end
 
-  def put_game(_), do: nil
+  defp do_put_game(_), do: nil
 
   @doc """
   Stores multiple games in the cache and broadcasts the update.
   """
-  def put_games(games) when is_list(games) do
+  def put_games(games) do
+    GenServer.call(__MODULE__, {:put_games, games})
+  end
+
+  defp do_put_games(games) when is_list(games) do
     games =
       games
       |> Enum.map(fn
@@ -138,7 +147,7 @@ defmodule FootyLive.Games do
     games
   end
 
-  def put_games(_), do: []
+  defp do_put_games(_), do: []
 
   @doc """
   Returns a sorted list of all available rounds.
@@ -228,6 +237,21 @@ defmodule FootyLive.Games do
   end
 
   @impl true
+  def handle_call({:put_game, game}, _from, state) do
+    {:ok, do_put_game(game), state}
+  end
+
+  @impl true
+  def handle_call({:put_games, games}, _from, state) do
+    {:ok, do_put_games(games), state}
+  end
+
+  @impl true
+  def handle_cast({:put_game, game}, state) do
+    {:ok, do_put_game(game), state}
+  end
+
+  @impl true
   def handle_info(:refresh, state) do
     do_refresh()
     timer = schedule_refresh()
@@ -253,7 +277,7 @@ defmodule FootyLive.Games do
             games
             |> Enum.map(&struct(Squiggle.Game, &1))
 
-          put_games(games)
+          do_put_games(games)
 
         {:error, _} ->
           []

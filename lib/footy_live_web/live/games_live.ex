@@ -27,7 +27,6 @@ defmodule FootyLiveWeb.GamesLive do
     round_id =
       params
       |> Map.get("round", Games.current_round())
-      |> IO.inspect(label: "Round")
       |> case do
         round_id when is_integer(round_id) ->
           round_id
