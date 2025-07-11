@@ -238,17 +238,18 @@ defmodule FootyLive.Games do
 
   @impl true
   def handle_call({:put_game, game}, _from, state) do
-    {:ok, do_put_game(game), state}
+    {:reply, do_put_game(game), state}
   end
 
   @impl true
   def handle_call({:put_games, games}, _from, state) do
-    {:ok, do_put_games(games), state}
+    {:reply, do_put_games(games), state}
   end
 
   @impl true
   def handle_cast({:put_game, game}, state) do
-    {:ok, do_put_game(game), state}
+    do_put_game(game)
+    {:noreply, state}
   end
 
   @impl true
