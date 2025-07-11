@@ -344,7 +344,12 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
           current_round
 
         _ ->
-          rounds |> Enum.at(-1) |> Map.get(:id)
+          rounds
+          |> Enum.at(-1)
+          |> case do
+            %{id: id} -> id
+            _ -> nil
+          end
       end
 
     games = FootyLive.Games.list_games(year: year)
