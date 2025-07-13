@@ -3,9 +3,16 @@ defmodule FootyLive.Realtime do
   require Logger
 
   @timeout :timer.minutes(1)
+  @initial_retry_delay :timer.seconds(1)
+  @max_retry_delay :timer.minutes(5)
 
   def init(_init_arg) do
-    state = %{pid: self()}
+    state = %{
+      pid: self(),
+      retry_count: 0,
+      retry_delay: @initial_retry_delay
+    }
+
     state = start_stream(state)
     {:ok, state}
   end
@@ -50,14 +57,23 @@ defmodule FootyLive.Realtime do
 
   def handle_info(:check_connection, state) do
     Logger.warning("No messages received in the last minute, reconnecting stream")
-    {:noreply, start_stream(state)}
+    new_delay = min(state.retry_delay * 2, @max_retry_delay)
+
+    Process.sleep(state.retry_delay)
+
+    new_state = %{state | retry_count: state.retry_count + 1, retry_delay: new_delay}
+
+    {:noreply, start_stream(new_state)}
   end
 
   def handle_info({:squiggle_event, event}, state) do
     event
     |> handle_squiggle_event()
 
-    {:noreply, state}
+    # Reset retry count and delay on successful event
+    new_state = %{state | retry_count: 0, retry_delay: @initial_retry_delay}
+
+    {:noreply, new_state}
   end
 
   defp handle_squiggle_event(%{event: "timestr", data: event_data}) do
