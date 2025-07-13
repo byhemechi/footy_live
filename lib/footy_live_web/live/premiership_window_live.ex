@@ -8,26 +8,6 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} route={:premiership_window}>
-      <div class="w-full max-w-screen-lg mx-auto px-4">
-        <details class="prose card bg-base-200 p-4 mx-auto max-w-none ">
-          <summary class="cursor-help">
-            <h2 class="inline">What am I looking at?</h2>
-          </summary>
-          <p>
-            This chart fundamentally just shows the AFL ladder's "percentage" column in a 2D format.
-          </p>
-          <p>
-            Though I disagree with Fox Footy calling this the "premiership window",
-            it does give an interesting insight into how a team is achieving their percentage over the season.
-          </p>
-          <p>
-            Credit for this design goes to
-            <a href="https://www.reddit.com/user/trapt777">u/trapt777</a>
-            on Reddit,
-            who has posted these for each round of the 2025 season.
-          </p>
-        </details>
-      </div>
       <div class="w-full max-w-screen-lg h-[calc(min(100dvh_-_var(--spacing)_*_20,_100dvw))] m-auto p-4">
         <div
           class="rounded-lg grid bg-base-200 relative card size-full gap-1.5 p-4"
@@ -243,8 +223,24 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
         </div>
       </div>
 
-      <div class="w-full max-w-screen-lg mx-auto px-4">
+      <div class="w-full max-w-screen-lg mx-auto px-4 flex flex-col gap-4">
         <section class="prose card bg-base-200 p-4 mx-auto max-w-none ">
+          <h2 class="inline">What am I looking at?</h2>
+          <p>
+            This chart fundamentally just shows the AFL ladder's "percentage" column in a 2D format.
+          </p>
+          <p>
+            Though I disagree with Fox Footy calling this the "premiership window",
+            it does give an interesting insight into how a team is achieving their percentage over the season.
+          </p>
+          <p>
+            Credit for this design goes to
+            <a href="https://www.reddit.com/user/trapt777">u/trapt777</a>
+            on Reddit,
+            who has posted these for each round of the 2025 season.
+          </p>
+        </section>
+        <section class="prose card bg-base-200 p-4 mx-auto max-w-none w-full">
           <h2>Key</h2>
           <table class="">
             <tbody>
@@ -283,7 +279,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
         </section>
       </div>
 
-      <div class="tabs tabs-box items-center justify-center max-w-max mx-auto my-4 pr-2 sticky bottom-4 shadow bg-base-300/60 backdrop-blur">
+      <div class="tabs tabs-box items-center justify-center max-w-max mx-auto my-4 pr-2 sticky bottom-4">
         <details class="dropdown dropdown-top">
           <summary class="btn m-1">{@year}<.icon name="hero-chevron-up" /></summary>
 

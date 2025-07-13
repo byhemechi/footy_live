@@ -1,11 +1,12 @@
-<header class="navbar px-4 sm:px-6 max-w-screen-lg mx-auto gap-4">
-  <.link navigate={~p"/"} class="flex gap-2 w-max">
-    <img
-      src={~p"/images/foomtbal.svg"}
-      class="flex-1 flex items-center gap-2 size-16 object-contain"
-    />
-  </.link>
-  <nav class="tabs tabs-box">
+<header class="navbar px-4 sm:px-6 max-w-screen-lg mx-auto gap-4 sticky top-0 z-50 justify-between">
+  <nav class="tabs tabs-box items-center">
+    <.link navigate={~p"/"} class="flex gap-2 w-max absolute">
+      <img
+        src={~p"/images/foomtbal.svg"}
+        class="flex-1 flex items-center gap-2 w-24  h-14 object-contain"
+      />
+    </.link>
+    <div class="w-26" />
     <.link navigate={~p"/"} class={["tab", assigns[:route] == :ladder && "tab-active"]}>
       Live Ladder
     </.link>
@@ -23,7 +24,8 @@
       Percentage Chart
     </.link>
   </nav>
-  <div class="flex-none ml-auto">
+
+  <div class="flex-none">
     <ul class="flex flex-column px-1 space-x-2 items-center">
       <li>
         <.theme_toggle />

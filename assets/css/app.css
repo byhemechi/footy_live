@@ -54,7 +54,7 @@
   --size-field: 0.21875rem;
   --border: 1.5px;
   --depth: 1;
-  --noise: 0;
+  --noise: 1;
 }
 
 @plugin "../vendor/daisyui-theme" {
@@ -89,7 +89,7 @@
   --size-field: 0.21875rem;
   --border: 1.5px;
   --depth: 1;
-  --noise: 0;
+  --noise: 1;
 }
 
 /* Add variants based on LiveView classes */
@@ -110,6 +110,10 @@ body {
   margin: 0;
   width: 100%;
   min-height: 100vh;
+}
+
+@utility tabs-box {
+  @apply shadow bg-base-300/60 backdrop-blur-md backdrop-saturate-150;
 }
 
 body {
