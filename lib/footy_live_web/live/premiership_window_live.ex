@@ -176,7 +176,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 stroke-dasharray="8"
               />
             </svg>
-            <div class="contents" id="teams" phx-update="stream">
+            <div class="contents isolate" id="teams" phx-update="stream">
               <div
                 :for={
                   {dom_id, {team, {s_for, s_against}}} <-
@@ -200,8 +200,19 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                   [
                     "left: #{(s_for - @start_for) / (@end_for - @start_for) * 100}%",
                     "top: #{(s_against - @start_against) / (@end_against - @start_against) * 100}%",
-                    "z-index: #{(s_for / s_against * 1000) |> round}"
+                    "z-index: #{(s_for / s_against * 1000) |> round}",
+                    case team.abbrev do
+                      "MEL" ->
+                        "background-image: url(#{Jason.encode!(~p"/images/melbourne-shape.svg")})"
+
+                      "SYD" ->
+                        "background-image: url(#{Jason.encode!(~p"/images/opera-house.svg")})"
+
+                      _ ->
+                        nil
+                    end
                   ]
+                  |> Enum.reject(&is_nil/1)
                   |> Enum.join(";")
                 }
               >

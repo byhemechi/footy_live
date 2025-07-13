@@ -217,7 +217,7 @@ body {
 
 [data-club="MEL"] {
   background: #061a33;
-  background-image: url("https://www.afl.com.au/resources/v5.32.21/i/elements/melbourne-shape.svg");
+  background-image: url("/images/melbourne-shape.svg");
   background-size: 100%;
   background-repeat: no-repeat;
 }
@@ -262,7 +262,7 @@ body {
 
 [data-club="SYD"] {
   background: #e1251b;
-  background-image: url("https://www.afl.com.au/resources/v5.32.21/i/elements/opera-house.svg");
+  background-image: url("/images/opera-house.svg");
   background-repeat: no-repeat;
   background-position: bottom;
   background-size: 50%;
