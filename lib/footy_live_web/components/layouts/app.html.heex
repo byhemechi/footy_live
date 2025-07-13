@@ -6,6 +6,9 @@
     />
   </.link>
   <nav class="tabs tabs-box">
+    <.link navigate={~p"/"} class={["tab", assigns[:route] == :ladder && "tab-active"]}>
+      Live Ladder
+    </.link>
     <.link navigate={~p"/teams"} class={["tab", assigns[:route] == :teams && "tab-active"]}>
       Teams
     </.link>

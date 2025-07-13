@@ -21,7 +21,7 @@ defmodule FootyLiveWeb.TeamsLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app {assigns}>
+    <Layouts.app flash={@flash} route={:teams}>
       <div class="px-4 sm:px-6 lg:px-8">
         <.header>
           Teams

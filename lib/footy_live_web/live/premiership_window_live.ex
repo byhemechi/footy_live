@@ -7,7 +7,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
 
   def render(assigns) do
     ~H"""
-    <Layouts.app {assigns}>
+    <Layouts.app flash={@flash} route={:premiership_window}>
       <div class="w-full max-w-screen-lg h-[calc(min(100dvh_-_var(--spacing)_*_20,_100dvw))] m-auto p-4">
         <div
           class="rounded-lg grid bg-base-200 relative card size-full gap-1.5 p-4"
