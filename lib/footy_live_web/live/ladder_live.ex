@@ -71,6 +71,10 @@ defmodule FootyLiveWeb.LadderLive do
         {data.points, data.points_for / data.points_against, data.played, id}
       end
       |> Enum.sort(&(&1 > &2))
+      |> Enum.with_index()
+      |> Enum.map(fn {{points, percentage, played, id}, rank} ->
+        {rank + 1, points, percentage, played, id}
+      end)
 
     max_played =
       Enum.reduce(team_points, 0, fn {_id, %{played: played}}, acc -> max(played, acc) end)
@@ -131,7 +135,7 @@ defmodule FootyLiveWeb.LadderLive do
       <details class="dropdown dropdown-bottom mx-auto">
         <summary class="btn m-1">{@year}<.icon name="hero-chevron-down" /></summary>
 
-        <div class="tabs tabs-box items-center justify-center max-w-max mx-auto my-4 dropdown-content">
+        <div class="tabs tabs-box items-center justify-center max-w-max mx-auto  dropdown-content bg-base-300">
           <.link
             :for={year <- @years}
             class={["tab w-full transition-all", @year == year && "tab-active"]}
@@ -143,7 +147,8 @@ defmodule FootyLiveWeb.LadderLive do
       </details>
       <div class="max-w-screen-lg md:card w-full bg-base-200 mx-auto">
         <.table id="ladder" rows={@ladder}>
-          <:col :let={{_points, ratio, _played, id}} label="Team">
+          <:col :let={{rank, _points, _ratio, _played, _id}} label="#">{rank}</:col>
+          <:col :let={{_rank, _points, ratio, _played, id}} label="Team">
             <div class="flex gap-2 items-center ">
               <div
                 class={[
@@ -164,7 +169,7 @@ defmodule FootyLiveWeb.LadderLive do
               {@teams[id].name}
             </div>
           </:col>
-          <:col :let={{points, ratio, played, _id}} label="Points">
+          <:col :let={{_rank, points, ratio, played, _id}} label="Points">
             {points}<span
               :if={played < @max_played}
               class="text-primary"
@@ -176,7 +181,7 @@ defmodule FootyLiveWeb.LadderLive do
               }
             >*</span>
           </:col>
-          <:col :let={{points, ratio, played, _id}} label="Percentage">
+          <:col :let={{_rank, points, ratio, played, _id}} label="Percentage">
             {(ratio * 100) |> Float.round(1)}%
           </:col>
         </.table>
