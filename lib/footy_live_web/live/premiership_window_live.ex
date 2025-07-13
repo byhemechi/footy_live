@@ -8,6 +8,26 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} route={:premiership_window}>
+      <div class="w-full max-w-screen-lg mx-auto px-4">
+        <details class="prose card bg-base-200 p-4 mx-auto max-w-none ">
+          <summary class="cursor-help">
+            <h2 class="inline">What am I looking at?</h2>
+          </summary>
+          <p>
+            This chart fundamentally just shows the AFL ladder's "percentage" column in a 2D format.
+          </p>
+          <p>
+            Though I disagree with Fox Footy calling this the "premiership window",
+            it does give an interesting insight into how a team is achieving their percentage over the season.
+          </p>
+          <p>
+            Credit for this design goes to
+            <a href="https://www.reddit.com/user/trapt777">u/trapt777</a>
+            on Reddit,
+            who has posted these for each round of the 2025 season.
+          </p>
+        </details>
+      </div>
       <div class="w-full max-w-screen-lg h-[calc(min(100dvh_-_var(--spacing)_*_20,_100dvw))] m-auto p-4">
         <div
           class="rounded-lg grid bg-base-200 relative card size-full gap-1.5 p-4"
@@ -222,31 +242,71 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
           </div>
         </div>
       </div>
+
+      <div class="w-full max-w-screen-lg mx-auto px-4">
+        <section class="prose card bg-base-200 p-4 mx-auto max-w-none ">
+          <h2>Key</h2>
+          <table class="">
+            <tbody>
+              <tr>
+                <td>
+                  <div class="w-4 h-1 rounded bg-success" />
+                </td>
+                <td>The "premiership window" (Average percentage for flag winners in the AFL era)</td>
+                <td>(percentage &ge; 130%)</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="w-4 h-1 rounded bg-warning" />
+                </td>
+                <td>
+                  The "maybeship window" (Lowest percentage for a flag winner in the AFL era - Richmond 2019)
+                </td>
+                <td>(percentage &ge; 113%)</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="w-4 h-1 rounded bg-info" />
+                </td>
+                <td>Average finals margin</td>
+                <td>(percentage &ge; 1.02)</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="w-4 h-1 rounded bg-error" />
+                </td>
+                <td>Spoon territory</td>
+                <td>(percentage &le; 0.69)</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+      <div class="tabs tabs-box items-center justify-center max-w-max mx-auto my-4 pr-2 sticky bottom-4 shadow bg-base-300/60 backdrop-blur">
+        <details class="dropdown dropdown-top">
+          <summary class="btn m-1">{@year}<.icon name="hero-chevron-up" /></summary>
+
+          <div class="tabs tabs-box items-center justify-center max-w-max mx-auto my-4 dropdown-content">
+            <.link
+              :for={year <- @years}
+              class={["tab w-full transition-all", @year == year && "tab-active"]}
+              patch={~p"/premiership_window?year=#{year}"}
+            >
+              {year}
+            </.link>
+          </div>
+        </details>
+        <.link
+          :for={round <- @rounds}
+          :if={round}
+          class={["tab transition-all", @round == round.id && "tab-active"]}
+          patch={~p"/premiership_window?round=#{round}&year=#{@year}"}
+        >
+          {round}
+        </.link>
+      </div>
     </Layouts.app>
-
-    <div class="tabs tabs-box items-center justify-center max-w-max mx-auto my-4 pr-2">
-      <details class="dropdown dropdown-top">
-        <summary class="btn m-1">{@year}<.icon name="hero-chevron-up" /></summary>
-
-        <div class="tabs tabs-box items-center justify-center max-w-max mx-auto my-4 dropdown-content">
-          <.link
-            :for={year <- @years}
-            class={["tab w-full transition-all", @year == year && "tab-active"]}
-            patch={~p"/premiership_window?year=#{year}"}
-          >
-            {year}
-          </.link>
-        </div>
-      </details>
-      <.link
-        :for={round <- @rounds}
-        :if={round}
-        class={["tab transition-all", @round == round.id && "tab-active"]}
-        patch={~p"/premiership_window?round=#{round}&year=#{@year}"}
-      >
-        {round}
-      </.link>
-    </div>
     """
   end
 
