@@ -42,7 +42,7 @@ let optsServer = {
   platform: "node",
   bundle: true,
   minify: false,
-  target: "node19.6.1",
+  target: "node22.17.0",
   conditions: serverConditions,
   alias: { svelte: "svelte" },
   outdir: "../priv/svelte",

@@ -89,7 +89,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # install nodejs for production environment
-RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash - && apt-get install -y nodejs
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs
 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen \
