@@ -27,7 +27,7 @@ RUN apt-get update \
 
 
 # install nodejs for build stage
-RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash - && apt-get install -y nodejs
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs
 
 # prepare build dir
 WORKDIR /app
