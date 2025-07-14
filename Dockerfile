@@ -50,17 +50,13 @@ RUN mkdir config
 COPY config/config.exs config/${MIX_ENV}.exs config/
 RUN mix deps.compile
 
-RUN mix assets.setup
-
 COPY priv priv
 
 COPY lib lib
 
 COPY assets assets
+RUN mix assets.setup
 
-# install all npm packages in assets directory
-WORKDIR /app/assets
-RUN npm ci
 
 # change back to build dir
 WORKDIR /app
