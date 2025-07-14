@@ -24,7 +24,6 @@ let optsClient = {
   outdir: "../priv/static/assets",
   logLevel: "info",
   target: "es2022",
-  splitting: true,
   format: "esm",
   sourcemap: watch ? "inline" : true,
   tsconfig: "./tsconfig.json",
