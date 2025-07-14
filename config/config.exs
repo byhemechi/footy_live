@@ -28,16 +28,6 @@ config :sentry,
 config :opentelemetry, span_processor: {Sentry.OpenTelemetry.SpanProcessor, []}
 config :opentelemetry, sampler: {Sentry.OpenTelemetry.Sampler, []}
 
-# Configure esbuild (the version is required)
-config :esbuild,
-  version: "0.17.11",
-  footy_live: [
-    args:
-      ~w(js/app.js js/sentry.js --bundle --splitting --format=esm --external:@sentry/browser --target=es2022 --sourcemap --outdir=../priv/static/assets/js --external:/fonts/* --external:/images/*),
-    cd: Path.expand("../assets", __DIR__),
-    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
-  ]
-
 # Configure tailwind (the version is required)
 config :tailwind,
   version: "4.0.9",

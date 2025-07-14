@@ -169,7 +169,7 @@ defmodule FootyLiveWeb.LadderLive do
               {@teams[id].name}
             </div>
           </:col>
-          <:col :let={{_rank, points, ratio, played, _id}} label="Points">
+          <:col :let={{_rank, points, _ratio, played, _id}} label="Points">
             {points}<span
               :if={played < @max_played}
               class="text-primary"

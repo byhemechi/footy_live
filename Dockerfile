@@ -22,8 +22,12 @@ FROM ${BUILDER_IMAGE} AS builder
 
 # install build dependencies
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends build-essential git \
+  && apt-get install -y --no-install-recommends build-essential git curl \
   && rm -rf /var/lib/apt/lists/*
+
+
+# install nodejs for build stage
+RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash - && apt-get install -y nodejs
 
 # prepare build dir
 WORKDIR /app
@@ -54,6 +58,13 @@ COPY lib lib
 
 COPY assets assets
 
+# install all npm packages in assets directory
+WORKDIR /app/assets
+RUN npm ci
+
+# change back to build dir
+WORKDIR /app
+
 # compile assets
 RUN mix assets.deploy
 
@@ -76,6 +87,9 @@ FROM ${RUNNER_IMAGE} AS final
 RUN apt-get update \
   && apt-get install -y --no-install-recommends libstdc++6 openssl libncurses5 locales ca-certificates curl \
   && rm -rf /var/lib/apt/lists/*
+
+# install nodejs for production environment
+RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash - && apt-get install -y nodejs
 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen \

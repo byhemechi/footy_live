@@ -17,6 +17,7 @@ defmodule FootyLive.Application do
     File.mkdir_p!(Application.fetch_env!(:footy_live, :ets_path))
 
     children = [
+      {NodeJS.Supervisor, [path: LiveSvelte.SSR.NodeJS.server_path(), pool_size: 4]},
       FootyLiveWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:footy_live, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: FootyLive.PubSub},

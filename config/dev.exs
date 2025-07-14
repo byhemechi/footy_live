@@ -15,7 +15,8 @@ config :footy_live, FootyLiveWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "rq/xYVLVJjDJiOHYUubFAl6ubr6apgSwiqSZ00Dc2mTDFtWfU7jBXs9z+yqZR+t+",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:footy_live, ~w(--sourcemap=inline --watch)]},
+    node: ["build.cjs", "--watch", cd: Path.expand("../assets", __DIR__)],
+    # esbuild: {Esbuild, :install_and_run, [:footy_live, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:footy_live, ~w(--watch)]}
   ]
 

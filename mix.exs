@@ -43,7 +43,6 @@ defmodule FootyLive.MixProject do
       {:phoenix_live_view, "~> 1.0"},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.3"},
-      {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:heroicons,
        github: "tailwindlabs/heroicons",
@@ -61,7 +60,6 @@ defmodule FootyLive.MixProject do
       {:req, "~> 0.5"},
       {:mox, "~> 1.0", only: :test},
       {:server_sent_events, "~> 0.2"},
-      {:phoenix_socket_bert, "~> 1.0"},
       {:sentry, "~> 11.0"},
       {:opentelemetry, "~> 1.5"},
       {:opentelemetry_api, "~> 1.4"},
@@ -69,7 +67,8 @@ defmodule FootyLive.MixProject do
       {:opentelemetry_semantic_conventions, "~> 1.27"},
       {:opentelemetry_phoenix, "~> 2.0"},
       {:opentelemetry_bandit, "~> 0.1"},
-      {:hackney, "~> 1.24"}
+      {:hackney, "~> 1.24"},
+      {:live_svelte, "~> 0.16.0"}
     ]
   end
 
@@ -82,11 +81,11 @@ defmodule FootyLive.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind footy_live", "esbuild footy_live"],
+      "assets.setup": ["tailwind.install --if-missing", "cmd --cd assets npm ci"],
+      "assets.build": ["tailwind footy_live", "cmd --cd assets node build.cjs"],
       "assets.deploy": [
         "tailwind footy_live --minify",
-        "esbuild footy_live --minify",
+        "cmd --cd assets node build.cjs --deploy",
         "phx.digest"
       ]
     ]

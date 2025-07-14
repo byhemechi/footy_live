@@ -11,53 +11,16 @@ defmodule FootyLiveWeb.Layouts do
 
   embed_templates "layouts/*"
 
-  @esm_sh_base URI.parse("https://esm.sh/")
-  @sentry_esm_script "https://esm.sh/@sentry/browser@9.35.0?bundle&exports=init,browserTracingIntegration,replayIntegration&target=es2022"
-  @sentry_import_map [
-    "<script type=\"importmap\">",
-    Jason.encode_to_iodata!(%{
-      "imports" => %{
-        "@sentry/browser" => @sentry_esm_script
-      }
-    }),
-    "</script>"
-  ]
-  @sentry_dep_scripts (with {:ok, _} <- Application.ensure_all_started(:req) do
-                         Req.get!(@sentry_esm_script)
-                         |> case do
-                           %Req.Response{status: 200, body: body} ->
-                             scripts =
-                               Regex.scan(~r/".*?"/, body)
-                               |> Enum.map(&Jason.decode/1)
-
-                             for {:ok, script} <- scripts do
-                               URI.append_path(@esm_sh_base, script) |> URI.to_string()
-                             end
-
-                           _ ->
-                             []
-                         end
-                       end)
-
   defp sentry_scripts(assigns) do
     assigns =
       assign(assigns,
-        sentry_dsn: Sentry.get_dsn(),
-        sentry_scripts: [@sentry_esm_script | @sentry_dep_scripts],
-        sentry_import_map: @sentry_import_map
+        sentry_dsn: Sentry.get_dsn()
       )
 
     ~H"""
     <%= if is_binary(@sentry_dsn) do %>
       <meta name="sentry-dsn" content={@sentry_dsn} />
-      {raw(@sentry_import_map)}
-      <link
-        :for={script <- @sentry_scripts}
-        rel="modulepreload"
-        href={script}
-        crossorigin="anonymous"
-      />
-      <script type="module" src={~p"/assets/js/sentry.js"} defer />
+      <script type="module" src={~p"/assets/sentry.js"} defer />
     <% end %>
     """
   end
