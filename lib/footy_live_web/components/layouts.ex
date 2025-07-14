@@ -22,20 +22,22 @@ defmodule FootyLiveWeb.Layouts do
     }),
     "</script>"
   ]
-  @sentry_dep_scripts Req.get!(@sentry_esm_script)
-                      |> (case do
-                            %Req.Response{status: 200, body: body} ->
-                              scripts =
-                                Regex.scan(~r/".*?"/, body)
-                                |> Enum.map(&Jason.decode/1)
+  @sentry_dep_scripts (with {:ok, _} <- Application.ensure_all_started(:req) do
+                         Req.get!(@sentry_esm_script)
+                         |> case do
+                           %Req.Response{status: 200, body: body} ->
+                             scripts =
+                               Regex.scan(~r/".*?"/, body)
+                               |> Enum.map(&Jason.decode/1)
 
-                              for {:ok, script} <- scripts do
-                                URI.append_path(@esm_sh_base, script) |> URI.to_string()
-                              end
+                             for {:ok, script} <- scripts do
+                               URI.append_path(@esm_sh_base, script) |> URI.to_string()
+                             end
 
-                            _ ->
-                              []
-                          end)
+                           _ ->
+                             []
+                         end
+                       end)
 
   defp sentry_scripts(assigns) do
     assigns =
