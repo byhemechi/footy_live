@@ -38,3 +38,28 @@
 {render_slot(@inner_block)}
 
 <.flash_group flash={@flash} />
+<footer class="mt-auto bg-base-200 overflow-hidden">
+  <div class="p-6 w-full max-w-screen-lg mx-auto flex flex-col sm:flex-row gap-4 font-display">
+    <div class="flex-1 text-lg prose prose-sm max-w-none m-0">
+      <p>
+        Source code available on <a href="https://github.com/byhemechi/footy_live">GitHub</a>. Feel free to open pull requests!
+      </p>
+      <p class="mb-0">
+        Special thanks to <a href="https://squiggle.com.au">Squiggle</a>
+        for its excellent API. <br />
+        I hate writing scrapers so much that without it this website would not exist.
+      </p>
+    </div>
+    <div class="flex flex-col justify-end gap-2">
+      <p>
+        <a
+          href="https://george.id.au"
+          class="font-medium text-zinc-400 transition hover:text-[#00aac4] hover:underline website-by"
+          style={"mask-image: url(#{~p"/images/gwf.svg"})"}
+        >
+          Website by George
+        </a>
+      </p>
+    </div>
+  </div>
+</footer>

@@ -308,3 +308,11 @@ body {
 [data-browser="chrome"] .chrome-fix-width {
   stroke-width: var(--chrome-stroke-width);
 }
+
+.website-by {
+  display: block;
+  height: 1.5rem;
+  aspect-ratio: 133.6 / 47.9;
+  background: currentcolor;
+  mask: center / cover;
+}

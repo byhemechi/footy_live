@@ -226,14 +226,14 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
             <tbody>
               <tr>
                 <td>
-                  <div class="w-4 h-1 rounded bg-success" />
+                  <div class="w-8 h-1 rounded bg-success" />
                 </td>
                 <td>The "premiership window" (Average percentage for flag winners in the AFL era)</td>
                 <td>(percentage &ge; {window(:premiership) * 100}%)</td>
               </tr>
               <tr>
                 <td>
-                  <div class="w-4 h-1 rounded bg-warning" />
+                  <div class="w-8 h-1 rounded bg-warning" />
                 </td>
                 <td>
                   The "maybeship window" (Lowest percentage for a flag winner in the AFL era - Richmond 2019)
@@ -242,14 +242,26 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               </tr>
               <tr>
                 <td>
-                  <div class="w-4 h-1 rounded bg-info" />
+                  <div class="w-8 h-1 flex justify-between">
+                    <div class="w-3.5 h-1 rounded bg-info" />
+                    <div class="w-3.5 h-1 rounded bg-info" />
+                  </div>
                 </td>
                 <td>Average finals margin</td>
                 <td>(percentage &ge; {window(:finals) * 100}%)</td>
               </tr>
               <tr>
                 <td>
-                  <div class="w-4 h-1 rounded bg-error" />
+                  <div class="w-8 h-1 flex justify-between">
+                    <div class="w-3.5 h-1 rounded bg-base-content/20" />
+                    <div class="w-3.5 h-1 rounded bg-base-content/20" />
+                  </div>
+                </td>
+                <td>League average (per axis)</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="w-8 h-1 rounded bg-error" />
                 </td>
                 <td>Spoon territory</td>
                 <td>(percentage &le; {window(:spoon) * 100}%)</td>
