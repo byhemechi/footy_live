@@ -76,9 +76,9 @@ defmodule FootyLiveWeb.GamesLive do
             <:col :let={{_id, game}} label="Date">{game.date |> format_date}</:col>
             <:col :let={{_id, game}} label="Home Team">
               <%= case Teams.get(game.hteamid) do %>
-                <% %Team{name: name, logo: logo}-> %>
+                <% %Team{name: name, abbrev: abbrev}-> %>
                   <div class="flex h-6 gap-2 items-center">
-                    <img src={"https://squiggle.com.au/#{logo}"} alt="" class="h-full" />
+                    <.team_badge abbrev={abbrev} />
                     {name}
                   </div>
                 <% _ -> %>
@@ -90,13 +90,9 @@ defmodule FootyLiveWeb.GamesLive do
             </:col>
             <:col :let={{_id, game}} label="Away Team">
               <%= case Teams.get(game.ateamid) do %>
-                <% %Team{name: name, logo: logo}-> %>
+                <% %Team{name: name, abbrev: abbrev}-> %>
                   <div class="flex gap-2 items-center">
-                    <img
-                      src={"https://squiggle.com.au/#{logo}"}
-                      alt=""
-                      class="w-6 h-6 object-contain"
-                    />
+                    <.team_badge abbrev={abbrev} />
                     {name}
                   </div>
                 <% _ -> %>

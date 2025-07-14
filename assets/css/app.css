@@ -111,17 +111,23 @@ body {
   width: 100%;
   min-height: 100vh;
 }
+@layer utilities {
+  .tabs-box {
+    @apply shadow bg-base-300/60 backdrop-blur-md backdrop-saturate-150;
 
-@utility tabs-box {
-  @apply shadow bg-base-300/60 backdrop-blur-md backdrop-saturate-150;
+    & > :is(.tab-active, [aria-selected="true"]):not(.tab-disabled, [disabled]),
+    & > :is(input:checked),
+    & > :is(label:has(:checked)) {
+      @apply bg-base-content/10;
+    }
+  }
 }
-
 body {
   display: grid;
   grid-template-rows: calc(var(--spacing) * 20) auto;
 }
 
-[data-club="ADE"] {
+.club-badge[data-club="ADE"] {
   background: linear-gradient(
     180deg,
     #0f1432 60%,
@@ -133,16 +139,16 @@ body {
   );
 }
 
-[data-club="BRI"] {
+.club-badge[data-club="BRI"] {
   background: linear-gradient(180deg, #255395 50%, #8b0042 0);
 }
-[data-club="CAR"] {
+.club-badge[data-club="CAR"] {
   background: #031e2f;
 }
-[data-club="COL"] .initials {
+.club-badge[data-club="COL"] .initials {
   background: #000;
 }
-[data-club="COL"] {
+.club-badge[data-club="COL"] {
   background: linear-gradient(
     90deg,
     #000 20%,
@@ -156,11 +162,11 @@ body {
   );
 }
 
-[data-club="ESS"] {
+.club-badge[data-club="ESS"] {
   background: linear-gradient(124deg, #000 40%, #c90527 0, #c90527 60%, #000 0);
 }
 
-[data-club="FRE"] {
+.club-badge[data-club="FRE"] {
   background: linear-gradient(
     180deg,
     #331c54 10%,
@@ -182,7 +188,7 @@ body {
   );
 }
 
-[data-club="GEE"] {
+.club-badge[data-club="GEE"] {
   background: linear-gradient(
     180deg,
     #024 13.33%,
@@ -196,17 +202,17 @@ body {
   );
 }
 
-[data-club="GCS"] {
+.club-badge[data-club="GCS"] {
   background: linear-gradient(180deg, #b00 73.33%, #fe0000 0, #fe0000);
 }
 
-[data-club="GWS"] {
+.club-badge[data-club="GWS"] {
   background: linear-gradient(180deg, #313b42 40%, #ff7900 0);
 }
-[data-club="HAW"] .initials {
+.club-badge[data-club="HAW"] .initials {
   background: #512b1b;
 }
-[data-club="HAW"] {
+.club-badge[data-club="HAW"] {
   background: linear-gradient(
     90deg,
     #512b1b 20%,
@@ -220,16 +226,17 @@ body {
   );
 }
 
-[data-club="MEL"] {
+.club-badge[data-club="MEL"] {
   background: #061a33;
-  background-image: url("/images/melbourne-shape.svg");
+  --club-image: url("/images/melbourne-shape.svg");
+  background-image: var(--club-image);
   background-size: 100%;
   background-repeat: no-repeat;
 }
-[data-club="NOR"] .initials {
+.club-badge[data-club="NOR"] .initials {
   background: #003ca0;
 }
-[data-club="NOR"] {
+.club-badge[data-club="NOR"] {
   background: linear-gradient(
     90deg,
     #003ca0 20%,
@@ -243,7 +250,7 @@ body {
   );
 }
 
-[data-club="POR"] {
+.club-badge[data-club="POR"] {
   background: linear-gradient(
     180deg,
     #000 60%,
@@ -254,26 +261,27 @@ body {
     #000 0
   );
 }
-[data-club="RIC"] .initials {
+.club-badge[data-club="RIC"] .initials {
   background: #000;
 }
-[data-club="RIC"] {
+.club-badge[data-club="RIC"] {
   background: linear-gradient(124deg, #000 40%, #ffd300 0, #ffd300 60%, #000 0);
 }
 
-[data-club="STK"] {
+.club-badge[data-club="STK"] {
   background: linear-gradient(180deg, #ed1b2e 40%, #000 0);
 }
 
-[data-club="SYD"] {
+.club-badge[data-club="SYD"] {
   background: #e1251b;
-  background-image: url("/images/opera-house.svg");
+  --club-image: url("/images/opera-house.svg");
+  background-image: var(--club-image);
   background-repeat: no-repeat;
   background-position: bottom;
   background-size: 50%;
 }
 
-[data-club="WCE"] {
+.club-badge[data-club="WCE"] {
   background: linear-gradient(
     180deg,
     #f2a900 20%,
@@ -283,7 +291,7 @@ body {
   );
 }
 
-[data-club="WBD"] {
+.club-badge[data-club="WBD"] {
   background: linear-gradient(
     180deg,
     #0039a6 60%,

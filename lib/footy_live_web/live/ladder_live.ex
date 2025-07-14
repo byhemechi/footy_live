@@ -149,23 +149,9 @@ defmodule FootyLiveWeb.LadderLive do
         <.table id="ladder" rows={@ladder}>
           <:col :let={{rank, _points, _ratio, _played, _id}} label="#">{rank}</:col>
           <:col :let={{_rank, _points, ratio, _played, id}} label="Team">
-            <div class="flex gap-2 items-center ">
-              <div
-                class={[
-                  "size-9 transition-all rounded-full border-2 shadow border-base-200 text-white",
-                  "flex items-center justify-center ",
-                  cond do
-                    ratio >= 1.3122 -> "ring ring-success"
-                    ratio >= 1.137 -> "ring ring-warning"
-                    ratio >= 1.02 -> "ring ring-neutral"
-                    ratio <= 0.69 -> "ring ring-error"
-                    true -> nil
-                  end
-                ]}
-                data-club={@teams[id].abbrev}
-              >
-                <div class="initials text-xs font-semibold">{@teams[id].abbrev}</div>
-              </div>
+            <div class="flex gap-2 items-center">
+              <.team_badge abbrev={@teams[id].abbrev} percentage={ratio} />
+
               {@teams[id].name}
             </div>
           </:col>

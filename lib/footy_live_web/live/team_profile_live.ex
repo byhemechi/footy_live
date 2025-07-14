@@ -34,57 +34,63 @@ defmodule FootyLiveWeb.TeamProfileLive do
   def render(assigns) do
     ~H"""
     <Layouts.app {assigns}>
-      <div class="space-y-8">
-        <div class="flex items-center gap-4">
-          <img src={"https://squiggle.com.au/#{@team.logo}"} alt="" class="w-16 h-16" />
-          <h1 class="text-2xl font-bold">{@team.name}</h1>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div class="card">
-            <h2 class="text-lg font-semibold mb-2">Team Info</h2>
-            <dl class="space-y-1">
-              <div class="flex gap-2">
-                <dt class="font-medium">Abbreviation:</dt>
-                <dd>{@team.abbrev}</dd>
-              </div>
-              <div class="flex gap-2">
-                <dt class="font-medium">Debut Year:</dt>
-                <dd>{@team.debut}</dd>
-              </div>
-              <%= if @team.retirement do %>
-                <div class="flex gap-2">
-                  <dt class="font-medium">Retired:</dt>
-                  <dd>{@team.retirement}</dd>
-                </div>
-              <% end %>
-            </dl>
+      <div class="w-full max-w-screen-lg mx-auto p-4">
+        <div class="space-y-8">
+          <div class="flex items-center gap-4">
+            <img
+              src={"https://squiggle.com.au/#{@team.logo}"}
+              alt=""
+              class="w-16 h-16 object-contain"
+            />
+            <h1 class="text-2xl font-bold">{@team.name}</h1>
           </div>
-        </div>
 
-        <div>
-          <h2 class="text-lg font-semibold mb-4">Recent Games</h2>
-          <div class="card  overflow-hidden">
-            <.table id="games" rows={@streams.games}>
-              <:col :let={{_id, game}} label="Round">
-                {game.round}
-              </:col>
-              <:col :let={{_id, game}} label="Home">
-                {game.hteam}
-                <%= if game.complete do %>
-                  ({game.hscore})
+          <div class="grid grid-cols-2 gap-4">
+            <div class="card">
+              <h2 class="text-lg font-semibold mb-2">Team Info</h2>
+              <dl class="space-y-1">
+                <div class="flex gap-2">
+                  <dt class="font-medium">Abbreviation:</dt>
+                  <dd>{@team.abbrev}</dd>
+                </div>
+                <div class="flex gap-2">
+                  <dt class="font-medium">Debut Year:</dt>
+                  <dd>{@team.debut}</dd>
+                </div>
+                <%= if @team.retirement do %>
+                  <div class="flex gap-2">
+                    <dt class="font-medium">Retired:</dt>
+                    <dd>{@team.retirement}</dd>
+                  </div>
                 <% end %>
-              </:col>
-              <:col :let={{_id, game}} label="Away">
-                {game.ateam}
-                <%= if game.complete do %>
-                  ({game.ascore})
-                <% end %>
-              </:col>
-              <:col :let={{_id, game}} label="Venue">
-                {game.venue}
-              </:col>
-            </.table>
+              </dl>
+            </div>
+          </div>
+
+          <div>
+            <h2 class="text-lg font-semibold mb-4">Recent Games</h2>
+            <div class="card  overflow-hidden">
+              <.table id="games" rows={@streams.games}>
+                <:col :let={{_id, game}} label="Round">
+                  {game.round}
+                </:col>
+                <:col :let={{_id, game}} label="Home">
+                  {game.hteam}
+                  <%= if game.complete do %>
+                    ({game.hscore})
+                  <% end %>
+                </:col>
+                <:col :let={{_id, game}} label="Away">
+                  {game.ateam}
+                  <%= if game.complete do %>
+                    ({game.ascore})
+                  <% end %>
+                </:col>
+                <:col :let={{_id, game}} label="Venue">
+                  {game.venue}
+                </:col>
+              </.table>
+            </div>
           </div>
         </div>
       </div>

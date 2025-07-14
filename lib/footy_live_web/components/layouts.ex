@@ -80,37 +80,34 @@ defmodule FootyLiveWeb.Layouts do
   """
   def theme_toggle(assigns) do
     ~H"""
-    <div class="card tabs tabs-box p-1">
-      <div class="relative flex flex-row">
-        <div class="absolute w-[33%] h-full tab tab-active left-0 [[data-theme=light]_&]:left-[33%] [[data-theme=dark]_&]:left-[66%] transition-[left]" />
+    <div class="card tabs  tabs-box p-1 relative flex flex-row">
+      <div class="theme-selector-handle absolute size-8 tab tab-active ml-1 left-0 [[data-theme=light]_&]:left-8 [[data-theme=dark]_&]:left-16 transition-[left]" />
+      <button
+        phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "system"})}
+        class="flex p-2 cursor-pointer text-base-content/75 hover:text-base-content"
+        aria-label="Use system theme"
+        title="Use system theme"
+      >
+        <.icon name="hero-computer-desktop-micro" class="size-4" />
+      </button>
 
-        <button
-          phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "system"})}
-          class="flex p-2 cursor-pointer"
-          aria-label="Use system theme"
-          title="Use system theme"
-        >
-          <.icon name="hero-computer-desktop-micro" class="size-4 opacity-75 hover:opacity-100" />
-        </button>
+      <button
+        phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "light"})}
+        class="flex p-2 cursor-pointer text-base-content/75 hover:text-base-content"
+        aria-label="Use light theme"
+        title="Use light theme"
+      >
+        <.icon name="hero-sun-micro" class="size-4" />
+      </button>
 
-        <button
-          phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "light"})}
-          class="flex p-2 cursor-pointer"
-          aria-label="Use light theme"
-          title="Use light theme"
-        >
-          <.icon name="hero-sun-micro" class="size-4 opacity-75 hover:opacity-100" />
-        </button>
-
-        <button
-          phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "dark"})}
-          class="flex p-2 cursor-pointer"
-          aria-label="Use dark theme"
-          title="Use dark theme"
-        >
-          <.icon name="hero-moon-micro" class="size-4 opacity-75 hover:opacity-100" />
-        </button>
-      </div>
+      <button
+        phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "dark"})}
+        class="flex p-2 cursor-pointer text-base-content/75 hover:text-base-content"
+        aria-label="Use dark theme"
+        title="Use dark theme"
+      >
+        <.icon name="hero-moon-micro" class="size-4" />
+      </button>
     </div>
     """
   end

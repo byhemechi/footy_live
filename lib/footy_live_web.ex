@@ -89,6 +89,8 @@ defmodule FootyLiveWeb do
       # Core UI components
       import FootyLiveWeb.CoreComponents
 
+      import FootyLiveWeb.Team, only: [team_badge: 1]
+
       # Common modules used in templates
       alias Phoenix.LiveView.JS
       alias FootyLiveWeb.Layouts

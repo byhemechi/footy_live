@@ -1,6 +1,7 @@
 defmodule FootyLiveWeb.PremiershipWindowLive do
   alias Squiggle.{Game, Team}
   use FootyLiveWeb, :live_view
+  import FootyLiveWeb.Team
   @topic "live_games"
 
   require OpenTelemetry.Tracer, as: Tracer
@@ -83,10 +84,10 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <path
                 d={
                   [
-                    "M #{(@start_against * 1.137 - @start_for) / (@end_for - @start_for)},0",
-                    "L 1,#{(@end_for / 1.137 - @start_against) / (@end_against - @start_against)}",
-                    "L 1,#{(@end_for / 1.3122 - @start_against) / (@end_against - @start_against)}",
-                    "L #{(@start_against * 1.3122 - @start_for) / (@end_for - @start_for)},0"
+                    "M #{(@start_against * window(:maybeship) - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / window(:maybeship) - @start_against) / (@end_against - @start_against)}",
+                    "L 1,#{(@end_for / window(:premiership) - @start_against) / (@end_against - @start_against)}",
+                    "L #{(@start_against * window(:premiership) - @start_for) / (@end_for - @start_for)},0"
                   ]
                   |> Enum.join("\n")
                 }
@@ -95,8 +96,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <path
                 d={
                   [
-                    "M #{(@start_against * 1.3122 - @start_for) / (@end_for - @start_for)},0",
-                    "L 1,#{(@end_for / 1.3122 - @start_against) / (@end_against - @start_against)}",
+                    "M #{(@start_against * window(:premiership) - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / window(:premiership) - @start_against) / (@end_against - @start_against)}",
                     "L 1 0"
                   ]
                   |> Enum.join("\n")
@@ -106,8 +107,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <path
                 d={
                   [
-                    "M #{(@start_against * 1.3122 - @start_for) / (@end_for - @start_for)},0",
-                    "L 1,#{(@end_for / 1.3122 - @start_against) / (@end_against - @start_against)}"
+                    "M #{(@start_against * window(:premiership) - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / window(:premiership) - @start_against) / (@end_against - @start_against)}"
                   ]
                   |> Enum.join("\n")
                 }
@@ -117,8 +118,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <path
                 d={
                   [
-                    "M #{(@start_against * 1.137 - @start_for) / (@end_for - @start_for)},0",
-                    "L 1,#{(@end_for / 1.137 - @start_against) / (@end_against - @start_against)}"
+                    "M #{(@start_against * window(:maybeship) - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / window(:maybeship) - @start_against) / (@end_against - @start_against)}"
                   ]
                   |> Enum.join("\n")
                 }
@@ -128,8 +129,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <path
                 d={
                   [
-                    "M #{(@start_against * 1.02 - @start_for) / (@end_for - @start_for)},0",
-                    "L 1,#{(@end_for / 1.02 - @start_against) / (@end_against - @start_against)}"
+                    "M #{(@start_against * window(:finals) - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / window(:finals) - @start_against) / (@end_against - @start_against)}"
                   ]
                   |> Enum.join("\n")
                 }
@@ -141,8 +142,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <path
                 d={
                   [
-                    "M 0,#{(@start_for / 0.69 - @start_against) / (@end_against - @start_against)}",
-                    "L #{(@end_against * 0.69 - @start_for) / (@end_for - @start_for)},1",
+                    "M 0,#{(@start_for / window(:spoon) - @start_against) / (@end_against - @start_against)}",
+                    "L #{(@end_against * window(:spoon) - @start_for) / (@end_for - @start_for)},1",
                     "L 0,1",
                     "z"
                   ]
@@ -153,8 +154,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <path
                 d={
                   [
-                    "M 0,#{(@start_for / 0.69 - @start_against) / (@end_against - @start_against)}",
-                    "L #{(@end_against * 0.69 - @start_for) / (@end_for - @start_for)},1"
+                    "M 0,#{(@start_for / window(:spoon) - @start_against) / (@end_against - @start_against)}",
+                    "L #{(@end_against * window(:spoon) - @start_for) / (@end_for - @start_for)},1"
                   ]
                   |> Enum.join("\n")
                 }
@@ -177,47 +178,26 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               />
             </svg>
             <div class="contents isolate" id="teams" phx-update="stream">
-              <div
+              <.team_badge
                 :for={
                   {dom_id, {team, {s_for, s_against}}} <-
                     @streams.teams
                 }
+                abbrev={team.abbrev}
                 id={dom_id}
-                title={"#{team.name}: #{s_for |> :erlang.float_to_binary(decimals: 1)} for, #{s_against  |> :erlang.float_to_binary(decimals: 1)} against"}
-                class={[
-                  "size-9 transition-all rounded-full border-2 shadow border-base-200 text-white",
-                  "flex items-center justify-center -translate-x-1/2 -translate-y-1/2 absolute",
-                  cond do
-                    s_for / s_against >= 1.3122 -> "ring ring-success"
-                    s_for / s_against >= 1.137 -> "ring ring-warning"
-                    s_for / s_against >= 1.02 -> "ring ring-neutral"
-                    s_for / s_against <= 0.69 -> "ring ring-error"
-                    true -> nil
-                  end
-                ]}
-                data-club={team.abbrev}
+                percentage={s_for / s_against}
                 style={
                   [
                     "left: #{(s_for - @start_for) / (@end_for - @start_for) * 100}%",
                     "top: #{(s_against - @start_against) / (@end_against - @start_against) * 100}%",
-                    "z-index: #{(s_for / s_against * 1000) |> round}",
-                    case team.abbrev do
-                      "MEL" ->
-                        "background-image: url(#{Jason.encode!(~p"/images/melbourne-shape.svg")})"
-
-                      "SYD" ->
-                        "background-image: url(#{Jason.encode!(~p"/images/opera-house.svg")})"
-
-                      _ ->
-                        nil
-                    end
+                    "z-index: #{(s_for / s_against * 1000) |> round}"
                   ]
                   |> Enum.reject(&is_nil/1)
                   |> Enum.join(";")
                 }
-              >
-                <div class="initials text-xs font-semibold">{team.abbrev}</div>
-              </div>
+                class=" -translate-x-1/2 -translate-y-1/2 absolute"
+                title={"#{team.name}: #{s_for |> :erlang.float_to_binary(decimals: 1)} for, #{s_against  |> :erlang.float_to_binary(decimals: 1)} against"}
+              />
             </div>
           </div>
         </div>

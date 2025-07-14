@@ -42,11 +42,8 @@ defmodule FootyLiveWeb.TeamsLive do
                     {team.name}
                   </.link>
                 </:col>
-                <:col :let={team} label="Abbreviation">{team.abbrev}</:col>
-                <:col :let={team} label="Logo">
-                  <%= if team.logo do %>
-                    <img src={"https://squiggle.com.au/#{team.logo}"} alt={team.name} class="h-8 w-8" />
-                  <% end %>
+                <:col :let={team} label="Abbreviation">
+                  <.team_badge abbrev={team.abbrev} />
                 </:col>
                 <:col :let={team} label="Debut">{team.debut}</:col>
                 <:col :let={team} label="Status">{team_status(team)}</:col>
