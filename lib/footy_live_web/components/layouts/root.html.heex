@@ -12,17 +12,7 @@
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <link rel="shortcut icon" href={~p"/images/foomtbal.svg"} />
 
-    <%= case Application.fetch_env(:sentry, :dsn) do %>
-      <% {:ok, dsn} -> %>
-        <meta name="sentry-dsn" content={dsn} />
-        <script
-          type="module"
-          src={"https://js.sentry-cdn.com/#{Application.fetch_env!(:sentry, :dsn) |> URI.parse |> Map.get(:userinfo)}.min.js"}
-          crossorigin="anonymous"
-          defer
-        />
-      <% _ -> %>
-    <% end %>
+    <.sentry_scripts />
     <%= if Application.fetch_env!(:footy_live, :umami_site_id) &&
       Application.fetch_env!(:footy_live, :umami_host) do %>
       <link rel="preconnect" href={Application.fetch_env!(:footy_live, :umami_host)} />
@@ -33,7 +23,7 @@
       >
       </script>
     <% end %>
-    <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
+    <script defer phx-track-static type="module" src={~p"/assets/js/app.js"}>
     </script>
     <link rel="preconnect" href="https://squiggle.com.au" />
     <script>
