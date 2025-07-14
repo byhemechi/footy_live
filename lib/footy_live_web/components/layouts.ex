@@ -23,7 +23,7 @@ defmodule FootyLiveWeb.Layouts do
       <link
         rel="preconnect"
         href={URI.parse(@sentry_dsn) |> Map.put(:path, nil) |> URI.to_string()}
-        crossorigin="anonymous"
+        crossorigin="use-credentials"
       />
       <script type="module" src={~p"/assets/sentry.js"} defer />
     <% end %>
