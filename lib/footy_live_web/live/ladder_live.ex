@@ -181,7 +181,7 @@ defmodule FootyLiveWeb.LadderLive do
               }
             >*</span>
           </:col>
-          <:col :let={{_rank, points, ratio, played, _id}} label="Percentage">
+          <:col :let={{_rank, _points, ratio, _played, _id}} label="Percentage">
             {(ratio * 100) |> Float.round(1)}%
           </:col>
         </.table>

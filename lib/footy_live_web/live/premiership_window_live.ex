@@ -83,10 +83,10 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <path
                 d={
                   [
-                    "M #{(@start_against * 1.13 - @start_for) / (@end_for - @start_for)},0",
-                    "L 1,#{(@end_for / 1.13 - @start_against) / (@end_against - @start_against)}",
-                    "L 1,#{(@end_for / 1.3 - @start_against) / (@end_against - @start_against)}",
-                    "L #{(@start_against * 1.3 - @start_for) / (@end_for - @start_for)},0"
+                    "M #{(@start_against * 1.137 - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / 1.137 - @start_against) / (@end_against - @start_against)}",
+                    "L 1,#{(@end_for / 1.3122 - @start_against) / (@end_against - @start_against)}",
+                    "L #{(@start_against * 1.3122 - @start_for) / (@end_for - @start_for)},0"
                   ]
                   |> Enum.join("\n")
                 }
@@ -95,8 +95,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <path
                 d={
                   [
-                    "M #{(@start_against * 1.3 - @start_for) / (@end_for - @start_for)},0",
-                    "L 1,#{(@end_for / 1.3 - @start_against) / (@end_against - @start_against)}",
+                    "M #{(@start_against * 1.3122 - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / 1.3122 - @start_against) / (@end_against - @start_against)}",
                     "L 1 0"
                   ]
                   |> Enum.join("\n")
@@ -106,8 +106,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <path
                 d={
                   [
-                    "M #{(@start_against * 1.3 - @start_for) / (@end_for - @start_for)},0",
-                    "L 1,#{(@end_for / 1.3 - @start_against) / (@end_against - @start_against)}"
+                    "M #{(@start_against * 1.3122 - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / 1.3122 - @start_against) / (@end_against - @start_against)}"
                   ]
                   |> Enum.join("\n")
                 }
@@ -117,8 +117,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
               <path
                 d={
                   [
-                    "M #{(@start_against * 1.13 - @start_for) / (@end_for - @start_for)},0",
-                    "L 1,#{(@end_for / 1.13 - @start_against) / (@end_against - @start_against)}"
+                    "M #{(@start_against * 1.137 - @start_for) / (@end_for - @start_for)},0",
+                    "L 1,#{(@end_for / 1.137 - @start_against) / (@end_against - @start_against)}"
                   ]
                   |> Enum.join("\n")
                 }
@@ -171,9 +171,9 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                   ]
                   |> Enum.join(" ")
                 }
-                class="stroke-neutral stroke-2 transition-all"
+                class="stroke-base-content/20 stroke-2 transition-all"
                 vector-effect="non-scaling-stroke"
-                stroke-dasharray="8"
+                stroke-dasharray="12"
               />
             </svg>
             <div class="contents isolate" id="teams" phx-update="stream">
@@ -188,8 +188,8 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                   "size-9 transition-all rounded-full border-2 shadow border-base-200 text-white",
                   "flex items-center justify-center -translate-x-1/2 -translate-y-1/2 absolute",
                   cond do
-                    s_for / s_against >= 1.3 -> "ring ring-success"
-                    s_for / s_against >= 1.13 -> "ring ring-warning"
+                    s_for / s_against >= 1.3122 -> "ring ring-success"
+                    s_for / s_against >= 1.137 -> "ring ring-warning"
                     s_for / s_against >= 1.02 -> "ring ring-neutral"
                     s_for / s_against <= 0.69 -> "ring ring-error"
                     true -> nil
@@ -249,7 +249,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                   <div class="w-4 h-1 rounded bg-success" />
                 </td>
                 <td>The "premiership window" (Average percentage for flag winners in the AFL era)</td>
-                <td>(percentage &ge; 130%)</td>
+                <td>(percentage &ge; 131.22%)</td>
               </tr>
               <tr>
                 <td>
@@ -258,21 +258,21 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
                 <td>
                   The "maybeship window" (Lowest percentage for a flag winner in the AFL era - Richmond 2019)
                 </td>
-                <td>(percentage &ge; 113%)</td>
+                <td>(percentage &ge; 113.7%)</td>
               </tr>
               <tr>
                 <td>
                   <div class="w-4 h-1 rounded bg-info" />
                 </td>
                 <td>Average finals margin</td>
-                <td>(percentage &ge; 1.02)</td>
+                <td>(percentage &ge; 102%)</td>
               </tr>
               <tr>
                 <td>
                   <div class="w-4 h-1 rounded bg-error" />
                 </td>
                 <td>Spoon territory</td>
-                <td>(percentage &le; 0.69)</td>
+                <td>(percentage &le; 69%)</td>
               </tr>
             </tbody>
           </table>
