@@ -20,7 +20,11 @@ defmodule FootyLiveWeb.Layouts do
     ~H"""
     <%= if is_binary(@sentry_dsn) do %>
       <meta name="sentry-dsn" content={@sentry_dsn} />
-      <link rel="preconnect" href={URI.parse(@sentry_dsn) |> Map.put(:path, nil) |> URI.to_string()} />
+      <link
+        rel="preconnect"
+        href={URI.parse(@sentry_dsn) |> Map.put(:path, nil) |> URI.to_string()}
+        crossorigin="anonymous"
+      />
       <script type="module" src={~p"/assets/sentry.js"} defer />
     <% end %>
     """
