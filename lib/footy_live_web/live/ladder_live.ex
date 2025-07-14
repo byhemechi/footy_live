@@ -155,8 +155,8 @@ defmodule FootyLiveWeb.LadderLive do
                   "size-9 transition-all rounded-full border-2 shadow border-base-200 text-white",
                   "flex items-center justify-center ",
                   cond do
-                    ratio >= 1.3 -> "ring ring-success"
-                    ratio >= 1.13 -> "ring ring-warning"
+                    ratio >= 1.3122 -> "ring ring-success"
+                    ratio >= 1.137 -> "ring ring-warning"
                     ratio >= 1.02 -> "ring ring-neutral"
                     ratio <= 0.69 -> "ring ring-error"
                     true -> nil
