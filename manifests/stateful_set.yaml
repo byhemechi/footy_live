@@ -25,12 +25,12 @@ spec:
           livenessProbe:
             initialDelaySeconds: 5
             httpGet:
-              port: "80"
+              port: 80
               path: /healthz
           readinessProbe:
             initialDelaySeconds: 5
             httpGet:
-              port: "80"
+              port: 80
               path: /healthz
           envFrom:
             - secretRef:
