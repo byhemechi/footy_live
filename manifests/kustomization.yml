@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - service_account.yaml
+  - stateful_set.yaml
+  - service.yaml
+images:
+  - name: foomtbal
+replacements:
+  - source:
+      fieldPath: metadata.name
+      kind: Service
+      name: foomtbal
+    targets:
+      - fieldPaths:
+          - spec.rules.*.backendRefs.[name=svc].name
+        select:
+          kind: HTTPRoute
+          name: route
+namespace: foomtbal
+labels:
+  - includeSelectors: true
+    pairs:
+      app: foomtbal

@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: foomtbal
+spec:
+  replicas: 1
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        resources:
+          requests:
+            storage: 1Gi
+
+  template:
+    spec:
+      serviceAccount: foomtbal-sa
+      setHostnameAsFQDN: true
+      containers:
+        - name: application
+          image: image
+          livenessProbe:
+            initialDelaySeconds: 5
+            httpGet:
+              port: 4000
+              path: /healthz
+          readinessProbe:
+            initialDelaySeconds: 5
+            httpGet:
+              port: 4000
+              path: /healthz
+          envFrom:
+            - secretRef:
+                name: foomtbal-secret
+            - configMapRef:
+                name: foomtbal-config
+
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          env:
+            - name: PORT
+              value: 4000
+            - name: FOOTY_LIVE_DB_PATH
+              value: /data
+
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 4000
