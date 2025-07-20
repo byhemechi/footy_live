@@ -9,6 +9,8 @@ spec:
     - metadata:
         name: data
       spec:
+        accessModes:
+          - ReadWriteMany
         resources:
           requests:
             storage: 1Gi
