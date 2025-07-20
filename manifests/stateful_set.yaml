@@ -17,7 +17,7 @@ spec:
 
   template:
     spec:
-      serviceAccount: foomtbal-sa
+      serviceAccount: foomtbal
       setHostnameAsFQDN: true
       containers:
         - name: application
