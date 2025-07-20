@@ -13,3 +13,16 @@ config :logger, level: :info
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
+config :libcluster,
+  topologies: [
+    erlang_nodes_in_k8s: [
+      strategy: Elixir.Cluster.Strategy.Kubernetes,
+      config: [
+        mode: :ip,
+        kubernetes_node_basename: "foomtbal",
+        kubernetes_selector: "app=foomtbal",
+        kubernetes_namespace: "foomtbal",
+        polling_interval: 10_000
+      ]
+    ]
+  ]
