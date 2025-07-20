@@ -17,7 +17,7 @@ defmodule FootyLive.Application do
     File.mkdir_p!(Application.fetch_env!(:footy_live, :ets_path))
 
     children = [
-      {Cluster.Supervisor, [[], [name: FootyLive.ClusterSupervisor]]},
+      {Cluster.Supervisor, [Application.get_env(:libcluster, :topologies), [name: FootyLive.ClusterSupervisor]]},
       {NodeJS.Supervisor, [path: LiveSvelte.SSR.NodeJS.server_path(), pool_size: 4]},
       FootyLiveWeb.Telemetry,
       {Phoenix.PubSub, name: FootyLive.PubSub},
