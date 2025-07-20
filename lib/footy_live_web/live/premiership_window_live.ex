@@ -399,9 +399,6 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
 
           round
 
-        _ when year == current_year ->
-          current_round
-
         _ ->
           rounds
           |> Enum.at(-1)
