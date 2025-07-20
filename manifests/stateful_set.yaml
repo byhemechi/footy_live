@@ -4,6 +4,7 @@ metadata:
   name: foomtbal
 spec:
   replicas: 1
+  serviceName: foomtbal
   volumeClaimTemplates:
     - metadata:
         name: data
@@ -22,12 +23,12 @@ spec:
           livenessProbe:
             initialDelaySeconds: 5
             httpGet:
-              port: 4000
+              port: "80"
               path: /healthz
           readinessProbe:
             initialDelaySeconds: 5
             httpGet:
-              port: 4000
+              port: "80"
               path: /healthz
           envFrom:
             - secretRef:
@@ -40,7 +41,7 @@ spec:
               mountPath: /data
           env:
             - name: PORT
-              value: 4000
+              value: "80"
             - name: FOOTY_LIVE_DB_PATH
               value: /data
 
