@@ -22,6 +22,7 @@ config :libcluster,
         kubernetes_node_basename: "foomtbal",
         kubernetes_selector: "app=foomtbal",
         kubernetes_namespace: "foomtbal",
+        kubernetes_service_name: "foomtbal",
         polling_interval: 10_000
       ]
     ]
