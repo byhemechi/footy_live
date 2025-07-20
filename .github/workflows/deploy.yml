@@ -69,7 +69,7 @@ jobs:
           cmd: |
             yq -i '(.images[] | select(.name == "foomtbal")) |= (
               .digest = "${{ steps.docker_build.outputs.digest }}" |
-              .newName = "${{ env.IMAGE }}"
+              .newName = "${{ env.IMAGE }}" |
               .newTag = "${{ steps.prep.outputs.BUILD_ID }}"
             )' manifests/kustomization.yml
 
