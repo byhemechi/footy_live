@@ -31,9 +31,6 @@ jobs:
           echo BUILD_ID=${BUILD_ID} >> $GITHUB_OUTPUT
           echo LATEST_ID=${LATEST_ID} >> $GITHUB_OUTPUT
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Setup Flux CLI
         uses: fluxcd/flux2/action@main
 
