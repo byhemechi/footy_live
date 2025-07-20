@@ -11,8 +11,6 @@ config :footy_live, FootyLiveWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
-raise inspect(System.get_env(), pretty: true)
-
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
 config :libcluster,
