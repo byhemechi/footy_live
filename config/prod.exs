@@ -11,6 +11,8 @@ config :footy_live, FootyLiveWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
+raise inspect(System.get_env(), pretty: true)
+
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
 config :libcluster,
@@ -19,7 +21,7 @@ config :libcluster,
       strategy: Elixir.Cluster.Strategy.Kubernetes,
       config: [
         mode: :hostname,
-        kubernetes_node_basename: "foomtbal",
+        kubernetes_node_basename: "footy_live",
         kubernetes_selector: "app=foomtbal",
         kubernetes_namespace: "foomtbal",
         kubernetes_service_name: "foomtbal",
