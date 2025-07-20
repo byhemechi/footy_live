@@ -18,7 +18,7 @@ config :libcluster,
     erlang_nodes_in_k8s: [
       strategy: Elixir.Cluster.Strategy.Kubernetes,
       config: [
-        mode: :ip,
+        mode: :hostname,
         kubernetes_node_basename: "foomtbal",
         kubernetes_selector: "app=foomtbal",
         kubernetes_namespace: "foomtbal",
