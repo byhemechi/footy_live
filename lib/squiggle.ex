@@ -16,8 +16,8 @@ defmodule Squiggle do
       {:ok, csv} = Squiggle.get(query: :ladder, format: :csv)
   """
 
-  @base_url "https://api.squiggle.au"
-  @user_agent "Elixir FootyLive -@byhemechi on twitter"
+  @base_url "https://api.squiggle.com.au"
+  @user_agent "Elixir FootyLive - @byhemechi on twitter/discord, hello@george.id.au"
 
   @type query ::
           :teams
