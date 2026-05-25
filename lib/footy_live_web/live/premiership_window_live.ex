@@ -390,7 +390,7 @@ defmodule FootyLiveWeb.PremiershipWindowLive do
 
     rounds = FootyLive.Games.list_rounds(year: year, hide_future: true)
 
-    current_round = FootyLive.Games.current_round().id
+    _current_round = FootyLive.Games.current_round().id
 
     round =
       case params do

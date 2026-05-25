@@ -10,7 +10,9 @@ defmodule FootyLive.Realtime do
     state = %{
       pid: self(),
       retry_count: 0,
-      retry_delay: @initial_retry_delay
+      retry_delay: @initial_retry_delay,
+      reset_timer: nil,
+      realtime_task: nil
     }
 
     state = start_stream(state)
@@ -18,41 +20,15 @@ defmodule FootyLive.Realtime do
   end
 
   defp start_stream(state) do
-    Task.start_link(fn ->
-      Req.get("https://api.squiggle.com.au/sse/events",
-        into: fn {:data, data}, {req, res} ->
-          # Reset the connection timer since we received data
-          pid = Req.Request.get_private(req, :pid) || state.pid
-          old_timer = Req.Request.get_private(req, :timer)
-          if old_timer, do: Process.cancel_timer(old_timer)
-
-          new_timer = Process.send_after(pid, :check_connection, @timeout)
-
-          # Process SSE data
-          buffer = Req.Request.get_private(req, :sse_buffer, "")
-          {events, new_buffer} = ServerSentEvents.parse(buffer <> data)
-
-          req =
-            req
-            |> Req.Request.put_private(:timer, new_timer)
-            |> Req.Request.put_private(:pid, pid)
-            |> Req.Request.put_private(:sse_buffer, new_buffer)
-
-          if events != [] do
-            for event <- events do
-              send(pid, {:squiggle_event, event})
-            end
-          end
-
-          {:cont, {req, res}}
-        end,
+    resp =
+      Req.get("https://sse.squiggle.com.au/events",
+        into: :self,
         headers: %{
-          "user-agent" => "Elixir FootyLive -@byhemechi on twitter"
+          "user-agent" => "Elixir FootyLive - @byhemechi on twitter/discord, hello@george.id.au"
         }
       )
-    end)
 
-    state
+    %{state | realtime_task: resp}
   end
 
   def handle_info(:check_connection, state) do
@@ -74,6 +50,20 @@ defmodule FootyLive.Realtime do
     new_state = %{state | retry_count: 0, retry_delay: @initial_retry_delay}
 
     {:noreply, new_state}
+  end
+
+  def handle_info({_pool, {:data, data}}, state) do
+    if !is_nil(state.reset_timer), do: Process.cancel_timer(state.reset_timer)
+
+    new_timer = Process.send_after(self(), :check_connection, @timeout)
+
+    {events, _rest} = ServerSentEvents.parse(data)
+
+    for event <- events do
+      send(self(), {:squiggle_event, event})
+    end
+
+    {:noreply, %{state | reset_timer: new_timer}}
   end
 
   defp handle_squiggle_event(%{event: "timestr", data: event_data}) do
